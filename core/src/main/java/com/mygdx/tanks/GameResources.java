@@ -9,6 +9,7 @@ public class GameResources {
     public static final String CONTROLLER_IMG_PATH = "textures_imgs/LargeHandleFilledGrey.png";
     public static final String BACKGROUND_CONTROLLER_IMG_PATH = "textures_imgs/Joystick.png";
     public static final String TANK_IMG_PATH = "textures_imgs/1_1.png";
+    public static final String ENEMY_TANK_IMG_PATH = "textures_imgs/enemy_tank.png";
     public static final String SHOOT_BTN_IMG_PATH = "textures_imgs/shoot_btn.png";
     public static final String BULLET_IMG_PATH = "textures_imgs/bullet.png";
     public static final String BRICK_IMG_PATH = "textures_imgs/brick.png";

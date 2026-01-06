@@ -54,6 +54,10 @@ public class WallsObject extends GameObject {
                 return GameSettings.STEEL_BIT;
             case GameSettings.TILE_EAGLE:
                 return GameSettings.EAGLE_BIT;
+            case GameSettings.TILE_WATER:
+                return GameSettings.WATER_BIT;
+            case GameSettings.TILE_FOREST:
+                return GameSettings.FOREST_BIT;
             default:
                 return GameSettings.BRICK_BIT;
         }

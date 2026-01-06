@@ -84,6 +84,30 @@ public class GameObject {
         fixtureDef.restitution = 0.0f;
         fixtureDef.filter.categoryBits = cBits;
 
+        if (kind.equals("bullet")) {
+            fixtureDef.filter.maskBits =
+                GameSettings.BRICK_BIT |
+                    GameSettings.STEEL_BIT |
+                    GameSettings.EAGLE_BIT |
+                    GameSettings.TANK_BIT;
+        } else if (kind.equals("wall")) {
+            if (cBits == GameSettings.WATER_BIT) {
+                fixtureDef.filter.maskBits =
+                    GameSettings.TANK_BIT;
+            } else if (cBits == GameSettings.FOREST_BIT) {
+                fixtureDef.isSensor = true;
+                fixtureDef.filter.maskBits =
+                    GameSettings.TANK_BIT |
+                        GameSettings.BULLET_BIT;
+            }
+            else {
+                fixtureDef.filter.maskBits =
+                    GameSettings.TANK_BIT |
+                        GameSettings.BULLET_BIT;
+            }
+        }
+
+
         Fixture fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
         shape.dispose();

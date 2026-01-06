@@ -26,6 +26,8 @@ public class GameSettings {
 
     // Box2D категории
     public static final short TANK_BIT = 1;
+    public static final short WATER_BIT = 0x0010;
+    public static final short FOREST_BIT = 0;
     public static final short BULLET_BIT = 2;
     public static final short BRICK_BIT = 4;
     public static final short STEEL_BIT = 8;
@@ -42,4 +44,5 @@ public class GameSettings {
     // Параметры
     public static final int SHOOTING_COOL_DOWN = 500; // ms
     public static final int SHOOTING_COOL_DOWN_ENEMIES = 1000; // ms
+    public static final int NEXT_MOVE = 3000;
 }

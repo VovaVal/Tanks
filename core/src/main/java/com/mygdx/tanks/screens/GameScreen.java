@@ -11,6 +11,11 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.tanks.GameResources;
@@ -51,6 +56,7 @@ public class GameScreen extends ScreenAdapter {
     ArrayList<BulletObject> bullets;
     ArrayList<WallsObject> walls;
     public ArrayList<WallsObject> wallsToDestroy;
+    public ArrayList<TankObject> tanks;
 
     private int shootPointer = -1; // Отслеживание пальца, который нажал кнопку выстрела
     private int joystickPointer = -1; // Отслеживание пальца, который использует джойстик
@@ -81,7 +87,7 @@ public class GameScreen extends ScreenAdapter {
             200, 200,
             GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
             GameResources.TANK_IMG_PATH,
-            myGdxGame.world
+            myGdxGame.world, false
         );
 
         uiCamera = new OrthographicCamera();
@@ -109,9 +115,29 @@ public class GameScreen extends ScreenAdapter {
 
         bullets = new ArrayList<>();
         walls = new ArrayList<>();
+        tanks = new ArrayList<>();
+        createEnemyTanks(4);
         wallsToDestroy = new ArrayList<>();
 
+        createWorldBounds();
+
         addMap();
+    }
+
+    private void createEnemyTanks(int num) {
+        int delta = GameSettings.MAP_WIDTH / num;
+
+        for (int i = 0; i <= num; i++) {
+            int x = delta * i + (GameSettings.TANK_PIXEL_SIZE / 2) + 80;
+            int y =  -80 + GameSettings.MAP_HEIGHT - (GameSettings.TANK_PIXEL_SIZE / 2);
+
+            TankObject tank = new TankObject(
+                x, y, GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
+                GameResources.ENEMY_TANK_IMG_PATH, myGdxGame.world, true
+            );
+
+            tanks.add(tank);
+        }
     }
 
     private void addMap() {
@@ -185,120 +211,203 @@ public class GameScreen extends ScreenAdapter {
         joystick.update();
         updateBullets();
         updateWalls();
+        updateEnemyTanks();
 
         myGdxGame.stepWorld();
 
         draw();
     }
 
-private void handleInput() {
-    for (int i = 0; i < Gdx.input.getMaxPointers(); i++) {
-        if (Gdx.input.isTouched(i)) {
-            Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
-            uiViewport.unproject(touchPos);
+    private void createWorldBounds() {
+        float w = GameSettings.MAP_WIDTH;
+        float h = GameSettings.MAP_HEIGHT;
+        float thickness = 20f;
 
-            switch (gameSession.state) {
-                case PLAYING:
-                    if (shootPointer == -1 && shootButton.isHit(touchPos.x, touchPos.y)) {
-                        shootPointer = i;  // Запоминаем, какой палец нажал кнопку
-                        System.out.println("Shoot button pressed!");
-                    }
+        createStaticWall(w / 2, -thickness / 2, w, thickness);       // низ
+        createStaticWall(w / 2, h + thickness / 2, w, thickness);    // верх
+        createStaticWall(-thickness / 2, h / 2, thickness, h);       // лево
+        createStaticWall(w + thickness / 2, h / 2, thickness, h);    // право
+    }
 
-                    if (shootPointer == i) {
-                        if (tankObject.canShoot()) {
-                            tankObject.shoot();
-                            System.out.println("Shoot!");
+    private void createStaticWall(float x, float y, float width, float height) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.position.set(x, y);
 
-                            int x = tankObject.getX();
-                            int y = tankObject.getY();
+        Body body = myGdxGame.world.createBody(bodyDef);
 
-                            Vector2 bulletDir = new Vector2();
-                            switch ((int) tankObject.angleDeg) {
-                                case 0:
-                                case 360:
-                                    bulletDir.set(0, 1);
-                                    y += 35;
-                                    break;
-                                case 180:
-                                    bulletDir.set(0, -1);
-                                    y -= 35;
-                                    break;
-                                case 90:
-                                    bulletDir.set(-1, 0);
-                                    x -= 35;
-                                    break;
-                                case 270:
-                                    bulletDir.set(1, 0);
-                                    x += 35;
-                                    break;
-                            }
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(width / 2f, height / 2f);
 
-                            BulletObject bulletObject = new BulletObject(
-                                x, y, GameSettings.BULLET_PIXEL_SIZE, GameSettings.BULLET_PIXEL_SIZE,
-                                GameResources.BULLET_IMG_PATH, myGdxGame.world, bulletDir, tankObject
-                            );
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.friction = 0f;
+        fixtureDef.restitution = 0f;
 
-                            bullets.add(bulletObject);
+        Fixture fixture = body.createFixture(fixtureDef);
+        fixture.setUserData("WORLD_BOUND");
+
+        shape.dispose();
+    }
+
+
+
+    private void handleInput() {
+        for (int i = 0; i < Gdx.input.getMaxPointers(); i++) {
+            if (Gdx.input.isTouched(i)) {
+                Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
+                uiViewport.unproject(touchPos);
+
+                switch (gameSession.state) {
+                    case PLAYING:
+                        if (shootPointer == -1 && shootButton.isHit(touchPos.x, touchPos.y)) {
+                            shootPointer = i;  // Запоминаем, какой палец нажал кнопку
+                            System.out.println("Shoot button pressed!");
                         }
-                    }
 
-                    if (joystickPointer == -1) {
-                        joystickPointer = i;  // Запоминаем палец для джойстика
-                        System.out.println("Joystick pressed!");
-                    }
+                        if (shootPointer == i) {
+                            if (tankObject.canShoot()) {
+                                tankObject.shoot();
+                                System.out.println("Shoot!");
 
-                    if (joystickPointer == i) {
-                        Vector2 dir = joystick.getDirection();
+                                int x = tankObject.getX();
+                                int y = tankObject.getY();
 
-                        if (dir.len() > 0) {
-                            float absX = Math.abs(dir.x);
-                            float absY = Math.abs(dir.y);
+                                Vector2 bulletDir = new Vector2();
+                                switch ((int) tankObject.angleDeg) {
+                                    case 0:
+                                    case 360:
+                                        bulletDir.set(0, 1);
+                                        y += 43;
+                                        break;
+                                    case 180:
+                                        bulletDir.set(0, -1);
+                                        y -= 43;
+                                        break;
+                                    case 90:
+                                        bulletDir.set(-1, 0);
+                                        x -= 43;
+                                        break;
+                                    case 270:
+                                        bulletDir.set(1, 0);
+                                        x += 43;
+                                        break;
+                                }
 
-                            if (absX > absY) {
-                                dir.y = 0;
-                                dir.x = Math.signum(dir.x);
-                                tankObject.angleDeg = (dir.x > 0) ? 270 : 90;
+                                BulletObject bulletObject = new BulletObject(
+                                    x, y, GameSettings.BULLET_PIXEL_SIZE, GameSettings.BULLET_PIXEL_SIZE,
+                                    GameResources.BULLET_IMG_PATH, myGdxGame.world, bulletDir, tankObject, false
+                                );
+
+                                bullets.add(bulletObject);
+                            }
+                        }
+
+                        if (joystickPointer == -1) {
+                            joystickPointer = i;  // Запоминаем палец для джойстика
+                            System.out.println("Joystick pressed!");
+                        }
+
+                        if (joystickPointer == i) {
+                            Vector2 dir = joystick.getDirection();
+
+                            if (dir.len() > 0) {
+                                float absX = Math.abs(dir.x);
+                                float absY = Math.abs(dir.y);
+
+                                if (absX > absY) {
+                                    dir.y = 0;
+                                    dir.x = Math.signum(dir.x);
+                                    tankObject.angleDeg = (dir.x > 0) ? 270 : 90;
+                                } else {
+                                    dir.x = 0;
+                                    dir.y = Math.signum(dir.y);
+                                    tankObject.angleDeg = (dir.y > 0) ? 0 : 180;
+                                }
+
+                                float speed = GameSettings.TANK_SPEED;
+                                float deltaX = dir.x * speed * Gdx.graphics.getDeltaTime();
+                                float deltaY = dir.y * speed * Gdx.graphics.getDeltaTime();
+                                tankObject.move(dir);
                             } else {
-                                dir.x = 0;
-                                dir.y = Math.signum(dir.y);
-                                tankObject.angleDeg = (dir.y > 0) ? 0 : 180;
+                                tankObject.stop();
                             }
-
-                            float speed = GameSettings.TANK_SPEED;
-                            float deltaX = dir.x * speed * Gdx.graphics.getDeltaTime();
-                            float deltaY = dir.y * speed * Gdx.graphics.getDeltaTime();
-                            tankObject.move(dir);
-                        } else {
-                            tankObject.stop();
                         }
-                    }
-                    break;
+                        break;
 
-                case PAUSED:
-                    System.out.println("Pause");
-                    break;
+                    case PAUSED:
+                        System.out.println("Pause");
+                        break;
 
-                case ENDED:
-                    System.out.println("End");
-                    break;
-            }
-        } else {
-            // Когда палец отпустили, сбрасываем указатель
-            if (shootPointer == i) {
-                shootPointer = -1;
-            }
-            if (joystickPointer == i) {
-                joystickPointer = -1;
+                    case ENDED:
+                        System.out.println("End");
+                        break;
+                }
+            } else {
+                // Когда палец отпустили, сбрасываем указатель
+                if (shootPointer == i) {
+                    shootPointer = -1;
+                }
+                if (joystickPointer == i) {
+                    joystickPointer = -1;
+                }
             }
         }
     }
-}
 
     private void updateWalls() {
         for (int i = 0; i < walls.size(); i++) {
             if (walls.get(i).destroyed) {
                 myGdxGame.world.destroyBody(walls.get(i).body);
                 walls.remove(i--);
+            }
+        }
+    }
+
+    private void updateEnemyTanks() {
+        for (int i = 0; i < tanks.size(); i++) {
+            if (tanks.get(i).isEnemy() && !tanks.get(i).isDestroyed()) {
+                tanks.get(i).enemyMove();
+
+                if (!tanks.get(i).isAlive()){
+                    tanks.remove(i--);
+                    continue;
+                }
+
+                if (tanks.get(i).canShoot()){
+                    tanks.get(i).shoot();
+
+                    int x = tanks.get(i).getX();
+                    int y = tanks.get(i).getY();
+
+                    Vector2 bulletDir = new Vector2();
+                    switch ((int) tanks.get(i).angleDeg) {
+                        case 0:
+                        case 360:
+                            bulletDir.set(0, 1);
+                            y += 43;
+                            break;
+                        case 180:
+                            bulletDir.set(0, -1);
+                            y -= 43;
+                            break;
+                        case 90:
+                            bulletDir.set(-1, 0);
+                            x -= 43;
+                            break;
+                        case 270:
+                            bulletDir.set(1, 0);
+                            x += 43;
+                            break;
+                    }
+
+                    BulletObject bulletObject = new BulletObject(
+                        x, y, GameSettings.BULLET_PIXEL_SIZE, GameSettings.BULLET_PIXEL_SIZE,
+                        GameResources.BULLET_IMG_PATH, myGdxGame.world, bulletDir, tanks.get(i), true
+                    );
+
+                    bullets.add(bulletObject);
+                }
             }
         }
     }
@@ -329,10 +438,9 @@ private void handleInput() {
         backgroundView.draw(myGdxGame.batch);
 
         tankObject.draw(myGdxGame.batch);
+        for (TankObject tank : tanks) tank.draw(myGdxGame.batch);
+        for (WallsObject wall : walls) wall.draw(myGdxGame.batch);
         for (BulletObject bullet : bullets) bullet.draw(myGdxGame.batch);
-        for (WallsObject wall : walls) {
-            wall.draw(myGdxGame.batch);
-        }
         myGdxGame.batch.end();
 
         // UI и кнопки
@@ -362,10 +470,13 @@ private void handleInput() {
             200, 200,
             GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
             GameResources.TANK_IMG_PATH,
-            myGdxGame.world
+            myGdxGame.world, false
         );
 
         bullets.clear();
+        tanks.clear();
+
+        createEnemyTanks(4);
 
         gameSession.startGame();
     }

@@ -8,8 +8,9 @@ import com.mygdx.tanks.GameSettings;
 public class BulletObject extends GameObject {
     public boolean wasHit;
     public int angleDeg;
+    private boolean enemyBullet;
 
-    public BulletObject(float x, float y, int width, int height, String texturePath, World world, Vector2 direction, TankObject tankObject) {
+    public BulletObject(float x, float y, int width, int height, String texturePath, World world, Vector2 direction, TankObject tankObject, Boolean enemyBullet) {
         super(texturePath, x, y, width, height, GameSettings.BULLET_BIT, world, "bullet");
 
         body.setLinearVelocity(new Vector2(
@@ -19,8 +20,13 @@ public class BulletObject extends GameObject {
         body.setBullet(true);
 
         this.angleDeg = tankObject.angleDeg - 90;
+        this.enemyBullet = enemyBullet;
 
         wasHit = false;
+    }
+
+    public boolean isEnemyBullet() {
+        return enemyBullet;
     }
 
     public boolean hasToBeDestroyed() {

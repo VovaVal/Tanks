@@ -27,8 +27,10 @@ public class ContactManager {
                 Fixture fixA = contact.getFixtureA();
                 Fixture fixB = contact.getFixtureB();
 
-                GameObject objA = (GameObject) fixA.getUserData();
-                GameObject objB = (GameObject) fixB.getUserData();
+//                GameObject objA = (GameObject) fixA.getUserData();
+//                GameObject objB = (GameObject) fixB.getUserData();
+                Object objA = fixA.getUserData();
+                Object objB = fixB.getUserData();
 
                 if ((objA instanceof BulletObject && objB instanceof WallsObject) ||
                     (objA instanceof WallsObject && objB instanceof BulletObject)) {
@@ -51,6 +53,41 @@ public class ContactManager {
                     if (wall.getType() == GameSettings.TILE_BRICK) {
                         wall.destroy();
                     }
+                } else if (objA instanceof BulletObject && objB instanceof BulletObject) {
+                    BulletObject bullet1;
+                    BulletObject bullet2;
+
+                    bullet1 = (BulletObject) objA;
+                    bullet2 = (BulletObject) objB;
+
+                    bullet1.hit();
+                    bullet2.hit();
+                } else if ((objA instanceof BulletObject && objB instanceof TankObject) ||
+                    (objA instanceof TankObject && objB instanceof BulletObject)) {
+                    TankObject tank;
+                    BulletObject bullet;
+
+                    if (objA instanceof TankObject) {
+                        tank = (TankObject) objA;
+                        bullet = (BulletObject) objB;
+                    } else {
+                        tank = (TankObject) objB;
+                        bullet = (BulletObject) objA;
+                    }
+
+                    bullet.hit();
+
+                    if (bullet.isEnemyBullet() && !tank.isEnemy()) {
+                        tank.hit();
+                    } else if (!bullet.isEnemyBullet() && tank.isEnemy()) {
+                        tank.hit();
+                    }
+                } else if ((objA instanceof BulletObject && "WORLD_BOUND".equals(objB)) ||
+                    ("WORLD_BOUND".equals(objA) && objB instanceof BulletObject)) {
+                    BulletObject bullet =
+                        objA instanceof BulletObject ? (BulletObject) objA : (BulletObject) objB;
+
+                    bullet.hit();
                 }
             }
 
@@ -61,31 +98,11 @@ public class ContactManager {
 
             @Override
             public void preSolve(Contact contact, Manifold oldManifold) {
-
-                Fixture fixtureA = contact.getFixtureA();
-                Fixture fixtureB = contact.getFixtureB();
-
-                GameObject objA = (GameObject) fixtureA.getUserData();
-                GameObject objB = (GameObject) fixtureB.getUserData();
-
-
-                if ((objA instanceof TankObject && objB instanceof WallsObject) ||
-                    (objA instanceof WallsObject && objB instanceof TankObject)) {
-
-                    System.out.println("Friction 0");
-                    contact.setFriction(0f);
-                    contact.setEnabled(true);
-                }
             }
 
             @Override
             public void postSolve(Contact contact, ContactImpulse impulse) {
 
-            }
-
-            private boolean isTankWall(Object a, Object b) {
-                return (a instanceof TankObject && b instanceof WallsObject)
-                    || (b instanceof TankObject && a instanceof WallsObject);
             }
         });
     }
