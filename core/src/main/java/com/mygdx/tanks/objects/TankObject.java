@@ -53,6 +53,8 @@ public class TankObject extends GameObject {
 
 
     public void move(Vector2 dir) {
+        System.out.println("x = " + this.getX());
+        System.out.println("y = " + this.getY());
         if (dir.len() > 0) {
             dir.nor();
             System.out.println("Move!!!");

@@ -232,12 +232,19 @@ public class GameScreen extends ScreenAdapter {
     private void createStaticWall(float x, float y, float width, float height) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(x, y);
+
+        bodyDef.position.set(
+            x * GameSettings.SCALE,
+            y * GameSettings.SCALE
+        );
 
         Body body = myGdxGame.world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(width / 2f, height / 2f);
+        shape.setAsBox(
+            (width / 2f) * GameSettings.SCALE,
+            (height / 2f) * GameSettings.SCALE
+        );
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -249,8 +256,6 @@ public class GameScreen extends ScreenAdapter {
 
         shape.dispose();
     }
-
-
 
     private void handleInput() {
         for (int i = 0; i < Gdx.input.getMaxPointers(); i++) {
