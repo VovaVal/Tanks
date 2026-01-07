@@ -3,13 +3,9 @@ package com.mygdx.tanks.objects;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.tanks.GameSettings;
-import com.mygdx.tanks.GameState;
-
-import java.util.Random;
 
 public class TankObject extends GameObject {
     private long lastShotTime;
@@ -22,12 +18,21 @@ public class TankObject extends GameObject {
     Vector2 dirMove;
     int coolDown;
 
+    enum EnemyState {
+        PATROL,
+        CHASE
+    }
+
+    private EnemyState state = EnemyState.PATROL;
+
+
     public TankObject(int x, int y, int width, int height, String texturePath, World world,
                       Boolean enemy) {
         super(texturePath, x, y, width, height, GameSettings.TANK_BIT, world, "tank");
 
         lastShotTime = TimeUtils.millis() - GameSettings.SHOOTING_COOL_DOWN;
-        body.setLinearDamping(13);
+        // body.setLinearDamping(13);
+        body.setLinearDamping(20);
         this.enemy = enemy;
         dirMove = new Vector2();
         startTime = TimeUtils.millis();
@@ -41,6 +46,41 @@ public class TankObject extends GameObject {
         }
     }
 
+    private boolean canSeePlayer(TankObject player) {
+        float dx = Math.abs(player.getX() - getX());
+        float dy = Math.abs(player.getY() - getY());
+
+        float distance = (float)Math.sqrt(dx * dx + dy * dy);
+        if (distance > GameSettings.VISION_RADIUS) return false;
+
+        return dx < GameSettings.AXIS_EPSILON || dy < GameSettings.AXIS_EPSILON;
+    }
+
+    private void chasePlayer(TankObject player) {
+        int px = player.getX();
+        int py = player.getY();
+
+        int x = getX();
+        int y = getY();
+
+        if (Math.abs(px - x) < GameSettings.AXIS_EPSILON) {
+            // Двигаемся по Y
+            dirMove.set(0, Math.signum(py - y));
+            angleDeg = (py > y) ? 0 : 180;
+        }
+        else if (Math.abs(py - y) < GameSettings.AXIS_EPSILON) {
+            // Двигаемся по X
+            dirMove.set(Math.signum(px - x), 0);
+            angleDeg = (px > x) ? 270 : 90;
+        }
+
+        body.setLinearVelocity(
+            dirMove.x * GameSettings.ENEMY_TANK_SPEED,
+            dirMove.y * GameSettings.ENEMY_TANK_SPEED
+        );
+    }
+
+
     private void chooseRandomDirection() {
         int dir = (int)(Math.random() * 4);
         switch(dir) {
@@ -50,7 +90,6 @@ public class TankObject extends GameObject {
             case 3: dirMove.set(1, 0); angleDeg = 270; break;
         }
     }
-
 
     public void move(Vector2 dir) {
         System.out.println("x = " + this.getX());
@@ -72,16 +111,31 @@ public class TankObject extends GameObject {
         return destroyed;
     }
 
-    public void enemyMove() {
+    public void enemyMove(TankObject player) {
         long currentTime = TimeUtils.millis();
+
+        if (canSeePlayer(player)) {
+            state = EnemyState.CHASE;
+        } else {
+            state = EnemyState.PATROL;
+        }
+
+        if (state == EnemyState.CHASE) {
+            chasePlayer(player);
+            return;
+        }
 
         if (currentTime > nextMove) {
             nextMove = currentTime + GameSettings.NEXT_MOVE;
             chooseRandomDirection();
         }
 
-        body.setLinearVelocity(dirMove.x * GameSettings.TANK_SPEED, dirMove.y * GameSettings.TANK_SPEED);
+        body.setLinearVelocity(
+            dirMove.x * GameSettings.ENEMY_TANK_SPEED,
+            dirMove.y * GameSettings.ENEMY_TANK_SPEED
+        );
     }
+
     public void stop() {
         body.setLinearVelocity(0, 0);
     }

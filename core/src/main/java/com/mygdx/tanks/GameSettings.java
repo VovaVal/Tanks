@@ -18,6 +18,7 @@ public class GameSettings {
 
     // Скорости (в метрах/сек)
     public static final float TANK_SPEED = 2.3f;
+    public static final float ENEMY_TANK_SPEED = 1.9f;
     public static final float BULLET_SPEED = 8.0f;
 
     // Размеры в пикселях
@@ -43,6 +44,10 @@ public class GameSettings {
 
     // Параметры
     public static final int SHOOTING_COOL_DOWN = 500; // ms
-    public static final int SHOOTING_COOL_DOWN_ENEMIES = 1000; // ms
+    public static final int SHOOTING_COOL_DOWN_ENEMIES = 1500; // ms
     public static final int NEXT_MOVE = 3000;
+
+    public static final float VISION_RADIUS = 450;   // радиус "зрения"
+    public static final float AXIS_EPSILON = 20f;     // погрешность по оси
+
 }

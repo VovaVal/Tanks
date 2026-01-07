@@ -283,19 +283,19 @@ public class GameScreen extends ScreenAdapter {
                                     case 0:
                                     case 360:
                                         bulletDir.set(0, 1);
-                                        y += 43;
+                                        y += 45;
                                         break;
                                     case 180:
                                         bulletDir.set(0, -1);
-                                        y -= 43;
+                                        y -= 45;
                                         break;
                                     case 90:
                                         bulletDir.set(-1, 0);
-                                        x -= 43;
+                                        x -= 45;
                                         break;
                                     case 270:
                                         bulletDir.set(1, 0);
-                                        x += 43;
+                                        x += 45;
                                         break;
                                 }
 
@@ -372,7 +372,7 @@ public class GameScreen extends ScreenAdapter {
     private void updateEnemyTanks() {
         for (int i = 0; i < tanks.size(); i++) {
             if (tanks.get(i).isEnemy() && !tanks.get(i).isDestroyed()) {
-                tanks.get(i).enemyMove();
+                tanks.get(i).enemyMove(tankObject);
 
                 if (!tanks.get(i).isAlive()){
                     tanks.remove(i--);

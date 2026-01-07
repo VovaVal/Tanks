@@ -88,6 +88,9 @@ public class ContactManager {
                         objA instanceof BulletObject ? (BulletObject) objA : (BulletObject) objB;
 
                     bullet.hit();
+                } else if (objA instanceof TankObject && objB instanceof TankObject) {
+                    ((TankObject) objA).stop();
+                    ((TankObject) objB).stop();
                 }
             }
 
