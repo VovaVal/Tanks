@@ -111,6 +111,10 @@ public class TankObject extends GameObject {
         return destroyed;
     }
 
+    public void setDestroyed(boolean destroyed) {
+        this.destroyed = destroyed;
+    }
+
     public void enemyMove(TankObject player) {
         long currentTime = TimeUtils.millis();
 

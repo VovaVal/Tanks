@@ -278,24 +278,26 @@ public class GameScreen extends ScreenAdapter {
                                 int x = tankObject.getX();
                                 int y = tankObject.getY();
 
+                                int offset = 45;
+
                                 Vector2 bulletDir = new Vector2();
                                 switch ((int) tankObject.angleDeg) {
                                     case 0:
                                     case 360:
                                         bulletDir.set(0, 1);
-                                        y += 45;
+                                        y += offset;
                                         break;
                                     case 180:
                                         bulletDir.set(0, -1);
-                                        y -= 45;
+                                        y -= offset;
                                         break;
                                     case 90:
                                         bulletDir.set(-1, 0);
-                                        x -= 45;
+                                        x -= offset;
                                         break;
                                     case 270:
                                         bulletDir.set(1, 0);
-                                        x += 45;
+                                        x += offset;
                                         break;
                                 }
 
@@ -375,6 +377,7 @@ public class GameScreen extends ScreenAdapter {
                 tanks.get(i).enemyMove(tankObject);
 
                 if (!tanks.get(i).isAlive()){
+                    myGdxGame.world.destroyBody(tanks.get(i).body);
                     tanks.remove(i--);
                     continue;
                 }
@@ -385,24 +388,26 @@ public class GameScreen extends ScreenAdapter {
                     int x = tanks.get(i).getX();
                     int y = tanks.get(i).getY();
 
+                    int offset = 45;
+
                     Vector2 bulletDir = new Vector2();
                     switch ((int) tanks.get(i).angleDeg) {
                         case 0:
                         case 360:
                             bulletDir.set(0, 1);
-                            y += 43;
+                            y += offset;
                             break;
                         case 180:
                             bulletDir.set(0, -1);
-                            y -= 43;
+                            y -= offset;
                             break;
                         case 90:
                             bulletDir.set(-1, 0);
-                            x -= 43;
+                            x -= offset;
                             break;
                         case 270:
                             bulletDir.set(1, 0);
-                            x += 43;
+                            x += offset;
                             break;
                     }
 
