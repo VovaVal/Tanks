@@ -73,7 +73,6 @@ public class GameObject {
         Shape shape;
 
         PolygonShape box = new PolygonShape();
-        // shape.setAsBox((width / 2f) * SCALE, (height / 2f) * SCALE);
         box.setAsBox((width / 2f) * SCALE, (height / 2f) * SCALE);
         shape = box;
 
@@ -89,7 +88,8 @@ public class GameObject {
                 GameSettings.BRICK_BIT |
                     GameSettings.STEEL_BIT |
                     GameSettings.EAGLE_BIT |
-                    GameSettings.TANK_BIT;
+                    GameSettings.TANK_BIT |
+                    GameSettings.BULLET_BIT;
         } else if (kind.equals("wall")) {
             if (cBits == GameSettings.WATER_BIT) {
                 fixtureDef.filter.maskBits =

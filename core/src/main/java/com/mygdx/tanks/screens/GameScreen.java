@@ -61,6 +61,13 @@ public class GameScreen extends ScreenAdapter {
     private int shootPointer = -1; // Отслеживание пальца, который нажал кнопку выстрела
     private int joystickPointer = -1; // Отслеживание пальца, который использует джойстик
 
+    private static final int MAX_ENEMIES_ON_MAP = 4;
+    private static final int TOTAL_ENEMIES = 10;
+
+    private int enemiesSpawned = 0;
+    private int enemiesKilled = 0;
+
+
     public GameScreen(Tanks myGdxGame) {
         this.myGdxGame = myGdxGame;
         contactManager = new ContactManager(myGdxGame.world, this);
@@ -121,7 +128,11 @@ public class GameScreen extends ScreenAdapter {
 
         addMap();
         createWorldBounds();
-        createEnemyTanks(4);
+
+        for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
+            spawnEnemyIfPossible();
+        }
+
     }
 
     private void createEnemyTanks(int num) {
@@ -203,6 +214,26 @@ public class GameScreen extends ScreenAdapter {
     public void resize(int width, int height) {
         worldViewport.update(width, height, true);
         uiViewport.update(width, height, true);
+    }
+
+    private void spawnEnemyIfPossible() {
+        if (enemiesSpawned >= TOTAL_ENEMIES) return;
+        if (tanks.size() >= MAX_ENEMIES_ON_MAP) return;
+
+        int x = 100;
+        int y = GameSettings.MAP_HEIGHT - 80;
+
+        TankObject tank = new TankObject(
+            x, y,
+            GameSettings.TANK_PIXEL_SIZE,
+            GameSettings.TANK_PIXEL_SIZE,
+            GameResources.ENEMY_TANK_IMG_PATH,
+            myGdxGame.world,
+            true
+        );
+
+        tanks.add(tank);
+        enemiesSpawned++;
     }
 
     public void render(float delta) {
@@ -379,6 +410,7 @@ public class GameScreen extends ScreenAdapter {
                 if (!tanks.get(i).isAlive()){
                     myGdxGame.world.destroyBody(tanks.get(i).body);
                     tanks.remove(i--);
+                    enemiesKilled++;
                     continue;
                 }
 
@@ -420,6 +452,7 @@ public class GameScreen extends ScreenAdapter {
                 }
             }
         }
+        spawnEnemyIfPossible();
     }
 
     private void updateBullets() {
@@ -494,7 +527,9 @@ public class GameScreen extends ScreenAdapter {
         bullets.clear();
         tanks.clear();
 
-        createEnemyTanks(4);
+        for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
+            spawnEnemyIfPossible();
+        }
 
         gameSession.startGame();
     }
