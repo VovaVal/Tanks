@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.GameSession;
 import com.mygdx.tanks.GameSettings;
+import com.mygdx.tanks.SpawnEffect;
 import com.mygdx.tanks.Tanks;
 import com.mygdx.tanks.components.BackgroundView;
 import com.mygdx.tanks.components.ButtonView;
@@ -68,6 +69,9 @@ public class GameScreen extends ScreenAdapter {
     private int enemiesSpawned = 0;
     private int enemiesKilled = 0;
     Texture spawnMarkerTexture;
+
+    Texture[] spawnFrames;
+    ArrayList<SpawnEffect> spawnEffects;
 
     Random random;
 
@@ -132,8 +136,15 @@ public class GameScreen extends ScreenAdapter {
         walls = new ArrayList<>();
         tanks = new ArrayList<>();
         spawns = new ArrayList<>();
-
         wallsToDestroy = new ArrayList<>();
+
+        spawnFrames = new Texture[4];
+        spawnFrames[0] = new Texture("textures_imgs/spawn_1.png");
+        spawnFrames[1] = new Texture("textures_imgs/spawn_2.png");
+        spawnFrames[2] = new Texture("textures_imgs/spawn_3.png");
+        spawnFrames[3] = new Texture("textures_imgs/spawn_4.png");
+
+        spawnEffects = new ArrayList<>();
 
         addMap();
         createWorldBounds();
@@ -232,28 +243,42 @@ public class GameScreen extends ScreenAdapter {
 
     private void spawnEnemyIfPossible() {
         if (enemiesSpawned >= TOTAL_ENEMIES) return;
-        if (tanks.size() >= MAX_ENEMIES_ON_MAP) return;
+        if (tanks.size() + spawnEffects.size() >= MAX_ENEMIES_ON_MAP) return;
 
         Vector2 coords = spawns.get(random.nextInt(spawns.size()));
 
-        int x = (int) coords.x;
-        int y = (int) coords.y;
+        SpawnEffect effect = new SpawnEffect(spawnFrames, coords.cpy(), 0.23f, GameSettings.TANK_PIXEL_SIZE);
+        spawnEffects.add(effect);
 
-        TankObject tank = new TankObject(
-            x, y,
-            GameSettings.TANK_PIXEL_SIZE,
-            GameSettings.TANK_PIXEL_SIZE,
-            GameResources.ENEMY_TANK_IMG_PATH,
-            myGdxGame.world,
-            true
-        );
-
-        tanks.add(tank);
         enemiesSpawned++;
+    }
+
+    private void updateSpawnEffects(float delta) {
+        for (int i = 0; i < spawnEffects.size(); i++) {
+            SpawnEffect effect = spawnEffects.get(i);
+            effect.update(delta);
+
+            if (effect.finished) {
+                TankObject tank = new TankObject(
+                    (int) effect.position.x,
+                    (int) effect.position.y,
+                    GameSettings.TANK_PIXEL_SIZE,
+                    GameSettings.TANK_PIXEL_SIZE,
+                    GameResources.ENEMY_TANK_IMG_PATH,
+                    myGdxGame.world,
+                    true
+                );
+                tanks.add(tank);
+
+                spawnEffects.remove(i--);
+            }
+        }
     }
 
     public void render(float delta) {
         handleInput();
+
+        updateSpawnEffects(Gdx.graphics.getDeltaTime());
 
         joystick.update();
         updateBullets();
@@ -496,15 +521,19 @@ public class GameScreen extends ScreenAdapter {
 
         backgroundView.draw(myGdxGame.batch);
 
-        for (int i = 0; i < spawns.size(); i++) {
-            float x = spawns.get(i).x;
-            float y = spawns.get(i).y;
+//        for (int i = 0; i < spawns.size(); i++) {
+//            float x = spawns.get(i).x;
+//            float y = spawns.get(i).y;
+//
+//            myGdxGame.batch.draw(
+//                spawnMarkerTexture,
+//                x - 16, y - 16,
+//                32, 32
+//            );
+//        }
 
-            myGdxGame.batch.draw(
-                spawnMarkerTexture,
-                x - 16, y - 16,
-                32, 32
-            );
+        for (SpawnEffect effect : spawnEffects) {
+            effect.draw(myGdxGame.batch);
         }
 
         tankObject.draw(myGdxGame.batch);
