@@ -45,17 +45,6 @@ public class GameSession {
 
     public void endGame() {
         state = GameState.ENDED;
-//        ArrayList<Integer> recordsTable = MemoryManager.loadRecordsTable();
-//        if (recordsTable == null) {
-//            recordsTable = new ArrayList<>();
-//        }
-//        int foundIdx = 0;
-//        for (; foundIdx < recordsTable.size(); foundIdx++) {
-//            if (recordsTable.get(foundIdx) < getScore()) break;
-//        }
-//        recordsTable.add(foundIdx, getScore());
-//        MemoryManager.saveTableOfRecords(recordsTable);
-
         destructedTankNumber = 0;
     }
 

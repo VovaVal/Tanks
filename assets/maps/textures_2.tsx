@@ -176,6 +176,7 @@
  <tile id="238" type="tank"/>
  <tile id="239" type="tank"/>
  <tile id="240" type="tank"/>
+ <tile id="242" type="6"/>
  <tile id="250" type="tank"/>
  <tile id="251" type="tank"/>
  <tile id="252" type="tank"/>

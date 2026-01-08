@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -21,18 +22,17 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.GameSession;
 import com.mygdx.tanks.GameSettings;
-import com.mygdx.tanks.GameState;
 import com.mygdx.tanks.Tanks;
 import com.mygdx.tanks.components.BackgroundView;
 import com.mygdx.tanks.components.ButtonView;
 import com.mygdx.tanks.components.VirtualJoystick;
 import com.mygdx.tanks.managers.ContactManager;
 import com.mygdx.tanks.objects.BulletObject;
-import com.mygdx.tanks.objects.GameObject;
 import com.mygdx.tanks.objects.TankObject;
 import com.mygdx.tanks.objects.WallsObject;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class GameScreen extends ScreenAdapter {
     Tanks myGdxGame;
@@ -57,6 +57,7 @@ public class GameScreen extends ScreenAdapter {
     ArrayList<WallsObject> walls;
     public ArrayList<WallsObject> wallsToDestroy;
     public ArrayList<TankObject> tanks;
+    public ArrayList<Vector2> spawns;
 
     private int shootPointer = -1; // Отслеживание пальца, который нажал кнопку выстрела
     private int joystickPointer = -1; // Отслеживание пальца, который использует джойстик
@@ -66,6 +67,9 @@ public class GameScreen extends ScreenAdapter {
 
     private int enemiesSpawned = 0;
     private int enemiesKilled = 0;
+    Texture spawnMarkerTexture;
+
+    Random random;
 
 
     public GameScreen(Tanks myGdxGame) {
@@ -81,6 +85,10 @@ public class GameScreen extends ScreenAdapter {
 
         float mapWidth = GameSettings.MAP_WIDTH;
         float mapHeight = GameSettings.MAP_HEIGHT;
+
+        random = new Random();
+
+        spawnMarkerTexture = new Texture(GameResources.SPAWN_IMG_PATH);
 
         gameCamera = new OrthographicCamera();
         gameCamera.setToOrtho(false, mapWidth, mapHeight);
@@ -123,6 +131,7 @@ public class GameScreen extends ScreenAdapter {
         bullets = new ArrayList<>();
         walls = new ArrayList<>();
         tanks = new ArrayList<>();
+        spawns = new ArrayList<>();
 
         wallsToDestroy = new ArrayList<>();
 
@@ -135,21 +144,21 @@ public class GameScreen extends ScreenAdapter {
 
     }
 
-    private void createEnemyTanks(int num) {
-        int delta = GameSettings.MAP_WIDTH / num;
-
-        for (int i = 0; i <= num; i++) {
-            int x = delta * i + (GameSettings.TANK_PIXEL_SIZE / 2) + 80;
-            int y = 1200;
-
-            TankObject tank = new TankObject(
-                x, y, GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
-                GameResources.ENEMY_TANK_IMG_PATH, myGdxGame.world, true
-            );
-
-            tanks.add(tank);
-        }
-    }
+//    private void createEnemyTanks(int num) {
+//        int delta = GameSettings.MAP_WIDTH / num;
+//
+//        for (int i = 0; i <= num; i++) {
+//            int x = delta * i + (GameSettings.TANK_PIXEL_SIZE / 2) + 80;
+//            int y = 1200;
+//
+//            TankObject tank = new TankObject(
+//                x, y, GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
+//                GameResources.ENEMY_TANK_IMG_PATH, myGdxGame.world, true
+//            );
+//
+//            tanks.add(tank);
+//        }
+//    }
 
     private void addMap() {
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("1 layout");
@@ -194,9 +203,14 @@ public class GameScreen extends ScreenAdapter {
                             System.out.println("Forest");
                             type = GameSettings.TILE_FOREST;
                             break;
+                        case "6":
+                            System.out.println("Spawn");
+                            type = GameSettings.TILE_SPAWN;
+                            spawns.add(new Vector2(worldX, worldY));
+                            break;
                     }
 
-                    if (type == 0) continue;
+                    if (type == 0 || type == 6) continue;
 
                     WallsObject wallObject = new WallsObject(
                         worldX, worldY,
@@ -220,8 +234,10 @@ public class GameScreen extends ScreenAdapter {
         if (enemiesSpawned >= TOTAL_ENEMIES) return;
         if (tanks.size() >= MAX_ENEMIES_ON_MAP) return;
 
-        int x = 100;
-        int y = GameSettings.MAP_HEIGHT - 80;
+        Vector2 coords = spawns.get(random.nextInt(spawns.size()));
+
+        int x = (int) coords.x;
+        int y = (int) coords.y;
 
         TankObject tank = new TankObject(
             x, y,
@@ -480,6 +496,17 @@ public class GameScreen extends ScreenAdapter {
 
         backgroundView.draw(myGdxGame.batch);
 
+        for (int i = 0; i < spawns.size(); i++) {
+            float x = spawns.get(i).x;
+            float y = spawns.get(i).y;
+
+            myGdxGame.batch.draw(
+                spawnMarkerTexture,
+                x - 16, y - 16,
+                32, 32
+            );
+        }
+
         tankObject.draw(myGdxGame.batch);
         for (TankObject tank : tanks) tank.draw(myGdxGame.batch);
         for (WallsObject wall : walls) wall.draw(myGdxGame.batch);
@@ -539,5 +566,6 @@ public class GameScreen extends ScreenAdapter {
         map.dispose();
         renderer.dispose();
         joystick.dispose();
+        spawnMarkerTexture.dispose();
     }
 }

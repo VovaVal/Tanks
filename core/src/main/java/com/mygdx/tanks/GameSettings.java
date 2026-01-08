@@ -41,13 +41,14 @@ public class GameSettings {
     public static final int TILE_WATER = 3;
     public static final int TILE_EAGLE = 4;
     public static final int TILE_FOREST = 5;
+    public static final int TILE_SPAWN = 6;
 
     // Параметры
     public static final int SHOOTING_COOL_DOWN = 500; // ms
     public static final int SHOOTING_COOL_DOWN_ENEMIES = 1500; // ms
     public static final int NEXT_MOVE = 3000;
 
-    public static final float VISION_RADIUS = 450;   // радиус "зрения"
+    public static final float VISION_RADIUS = 550;   // радиус "зрения"
     public static final float AXIS_EPSILON = 20f;     // погрешность по оси
 
 }
