@@ -22,7 +22,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.GameSession;
 import com.mygdx.tanks.GameSettings;
-import com.mygdx.tanks.SpawnEffect;
+import com.mygdx.tanks.Effect;
 import com.mygdx.tanks.Tanks;
 import com.mygdx.tanks.components.BackgroundView;
 import com.mygdx.tanks.components.ButtonView;
@@ -71,7 +71,9 @@ public class GameScreen extends ScreenAdapter {
     Texture spawnMarkerTexture;
 
     Texture[] spawnFrames;
-    ArrayList<SpawnEffect> spawnEffects;
+    ArrayList<Effect> spawnEffects;
+    Texture[] deathFrames;
+    ArrayList<Effect> deathEffects;
 
     Random random;
 
@@ -145,6 +147,12 @@ public class GameScreen extends ScreenAdapter {
         spawnFrames[3] = new Texture("textures_imgs/spawn_4.png");
 
         spawnEffects = new ArrayList<>();
+
+        deathEffects = new ArrayList<>();
+        deathFrames = new Texture[3];
+        deathFrames[0] = new Texture("textures_imgs/explosion_1.png");
+        deathFrames[1] = new Texture("textures_imgs/explosion_2.png");
+        deathFrames[2] = new Texture("textures_imgs/explosion_3.png");
 
         addMap();
         createWorldBounds();
@@ -247,7 +255,7 @@ public class GameScreen extends ScreenAdapter {
 
         Vector2 coords = spawns.get(random.nextInt(spawns.size()));
 
-        SpawnEffect effect = new SpawnEffect(spawnFrames, coords.cpy(), 0.23f, GameSettings.TANK_PIXEL_SIZE);
+        Effect effect = new Effect(spawnFrames, coords.cpy(), 0.23f, GameSettings.TANK_PIXEL_SIZE);
         spawnEffects.add(effect);
 
         enemiesSpawned++;
@@ -255,7 +263,7 @@ public class GameScreen extends ScreenAdapter {
 
     private void updateSpawnEffects(float delta) {
         for (int i = 0; i < spawnEffects.size(); i++) {
-            SpawnEffect effect = spawnEffects.get(i);
+            Effect effect = spawnEffects.get(i);
             effect.update(delta);
 
             if (effect.finished) {
@@ -523,18 +531,7 @@ public class GameScreen extends ScreenAdapter {
 
         backgroundView.draw(myGdxGame.batch);
 
-//        for (int i = 0; i < spawns.size(); i++) {
-//            float x = spawns.get(i).x;
-//            float y = spawns.get(i).y;
-//
-//            myGdxGame.batch.draw(
-//                spawnMarkerTexture,
-//                x - 16, y - 16,
-//                32, 32
-//            );
-//        }
-
-        for (SpawnEffect effect : spawnEffects) {
+        for (Effect effect : spawnEffects) {
             effect.draw(myGdxGame.batch);
         }
 

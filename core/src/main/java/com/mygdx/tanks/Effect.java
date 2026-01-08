@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 
-public class SpawnEffect {
+public class Effect {
     private Texture[] frames;
     private float frameTime;
     private int currentFrame;
@@ -13,7 +13,7 @@ public class SpawnEffect {
     public Vector2 position;
     private float size;
 
-    public SpawnEffect(Texture[] frames, Vector2 position, float frameTime, float size) {
+    public Effect(Texture[] frames, Vector2 position, float frameTime, float size) {
         this.frames = frames;
         this.position = position;
         this.frameTime = frameTime;
