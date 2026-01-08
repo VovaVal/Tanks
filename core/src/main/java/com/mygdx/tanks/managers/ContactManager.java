@@ -17,9 +17,12 @@ public class ContactManager {
     World world;
     GameScreen gameScreen;
 
-    public ContactManager(World world, GameScreen gameScreen) {
+    AudioManager audioManager;
+
+    public ContactManager(World world, GameScreen gameScreen, AudioManager audioManager) {
         this.world = world;
         this.gameScreen = gameScreen;
+        this.audioManager = audioManager;
 
         world.setContactListener(new ContactListener() {
             @Override
@@ -27,8 +30,6 @@ public class ContactManager {
                 Fixture fixA = contact.getFixtureA();
                 Fixture fixB = contact.getFixtureB();
 
-//                GameObject objA = (GameObject) fixA.getUserData();
-//                GameObject objB = (GameObject) fixB.getUserData();
                 Object objA = fixA.getUserData();
                 Object objB = fixB.getUserData();
 
@@ -52,6 +53,9 @@ public class ContactManager {
 
                     if (wall.getType() == GameSettings.TILE_BRICK) {
                         wall.destroy();
+                    }
+                    else if (wall.getType() == GameSettings.TILE_STEEL && !bullet.isEnemyBullet()) {
+                        audioManager.hitSteelSound.play();
                     }
                 } else if (objA instanceof BulletObject && objB instanceof BulletObject) {
                     BulletObject bullet1;

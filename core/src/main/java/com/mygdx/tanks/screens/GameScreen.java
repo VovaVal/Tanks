@@ -78,7 +78,7 @@ public class GameScreen extends ScreenAdapter {
 
     public GameScreen(Tanks myGdxGame) {
         this.myGdxGame = myGdxGame;
-        contactManager = new ContactManager(myGdxGame.world, this);
+        contactManager = new ContactManager(myGdxGame.world, this, myGdxGame.audioManager);
 
         gameSession = new GameSession();
 
@@ -345,6 +345,7 @@ public class GameScreen extends ScreenAdapter {
                         if (shootPointer == i) {
                             if (tankObject.canShoot()) {
                                 tankObject.shoot();
+                                myGdxGame.audioManager.shoot.play();
                                 System.out.println("Shoot!");
 
                                 int x = tankObject.getX();
@@ -449,6 +450,7 @@ public class GameScreen extends ScreenAdapter {
                 tanks.get(i).enemyMove(tankObject);
 
                 if (!tanks.get(i).isAlive()){
+                    myGdxGame.audioManager.death.play();
                     myGdxGame.world.destroyBody(tanks.get(i).body);
                     tanks.remove(i--);
                     enemiesKilled++;
@@ -586,6 +588,12 @@ public class GameScreen extends ScreenAdapter {
         for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
             spawnEnemyIfPossible();
         }
+
+        myGdxGame.audioManager.startSound.play();
+        myGdxGame.audioManager.backgroundMusicGame.play();
+
+        enemiesSpawned = 0;
+        enemiesKilled = 0;
 
         gameSession.startGame();
     }

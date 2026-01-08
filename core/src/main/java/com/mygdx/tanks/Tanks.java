@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.World;
+import com.mygdx.tanks.managers.AudioManager;
 import com.mygdx.tanks.screens.GameScreen;
 
 import static com.mygdx.tanks.GameSettings.*;
@@ -25,6 +26,8 @@ public class Tanks extends Game {
 
     public GameScreen gameScreen;
 
+    public AudioManager audioManager;
+
     public BitmapFont largeWhiteFont;
     public BitmapFont commonWhiteFont;
     public BitmapFont commonBlackFont;
@@ -37,6 +40,8 @@ public class Tanks extends Game {
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT);
+
+        audioManager = new AudioManager();
 
         gameScreen = new GameScreen(this);
 

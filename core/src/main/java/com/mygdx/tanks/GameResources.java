@@ -20,4 +20,10 @@ public class GameResources {
     public static final String SPAWN_IMG_PATH = "textures_imgs/spawn.png";
 
     public static final String FONT_PATH = "fonts/Montserrat-Bold.ttf";
+
+    public static final String DEATH_SOUND_PATH = "sounds/death_sound.mp3";
+    public static final String PLAY_SOUND_PATH = "sounds/play_sound.mp3";
+    public static final String SHOOT_SOUND_PATH = "sounds/shoot_sound.mp3";
+    public static final String START_SOUND_PATH = "sounds/start_sound.mp3";
+    public static final String HIT_STEEL_SOUND_PATH = "sounds/hit_steel_sound.mp3";
 }
