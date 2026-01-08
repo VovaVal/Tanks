@@ -149,6 +149,7 @@ public class GameScreen extends ScreenAdapter {
         spawnEffects = new ArrayList<>();
 
         deathEffects = new ArrayList<>();
+
         deathFrames = new Texture[3];
         deathFrames[0] = new Texture("textures_imgs/explosion_1.png");
         deathFrames[1] = new Texture("textures_imgs/explosion_2.png");
@@ -261,6 +262,13 @@ public class GameScreen extends ScreenAdapter {
         enemiesSpawned++;
     }
 
+    private void playDeath(TankObject tank) {
+        Vector2 coords = new Vector2((int) tank.getX(), (int) tank.getY());
+
+        Effect effect = new Effect(deathFrames, coords.cpy(), 0.17f, GameSettings.TANK_PIXEL_SIZE);
+        deathEffects.add(effect);
+    }
+
     private void updateSpawnEffects(float delta) {
         for (int i = 0; i < spawnEffects.size(); i++) {
             Effect effect = spawnEffects.get(i);
@@ -283,10 +291,22 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
+    private void updateDeathEffects(float delta) {
+        for (int i = 0; i < deathEffects.size(); i++) {
+            Effect effect = deathEffects.get(i);
+            effect.update(delta);
+
+            if (effect.finished) {
+                deathEffects.remove(i--);
+            }
+        }
+    }
+
     public void render(float delta) {
         handleInput();
 
         updateSpawnEffects(Gdx.graphics.getDeltaTime());
+        updateDeathEffects(Gdx.graphics.getDeltaTime());
 
         joystick.update();
         updateBullets();
@@ -459,6 +479,7 @@ public class GameScreen extends ScreenAdapter {
 
                 if (!tanks.get(i).isAlive()){
                     myGdxGame.audioManager.death.play();
+                    playDeath(tanks.get(i));
                     myGdxGame.world.destroyBody(tanks.get(i).body);
                     tanks.remove(i--);
                     enemiesKilled++;
@@ -531,7 +552,11 @@ public class GameScreen extends ScreenAdapter {
 
         backgroundView.draw(myGdxGame.batch);
 
-        for (Effect effect : spawnEffects) {
+        for (Effect effect: spawnEffects) {
+            effect.draw(myGdxGame.batch);
+        }
+
+        for (Effect effect: deathEffects) {
             effect.draw(myGdxGame.batch);
         }
 
