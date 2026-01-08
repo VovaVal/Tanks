@@ -265,7 +265,7 @@ public class GameScreen extends ScreenAdapter {
     private void playDeath(TankObject tank) {
         Vector2 coords = new Vector2((int) tank.getX(), (int) tank.getY());
 
-        Effect effect = new Effect(deathFrames, coords.cpy(), 0.17f, GameSettings.TANK_PIXEL_SIZE);
+        Effect effect = new Effect(deathFrames, coords.cpy(), 0.13f, GameSettings.TANK_PIXEL_SIZE);
         deathEffects.add(effect);
     }
 
