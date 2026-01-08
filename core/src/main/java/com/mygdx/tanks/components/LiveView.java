@@ -6,7 +6,7 @@ import com.mygdx.tanks.GameResources;
 
 public class LiveView extends View {
 
-    private final static int livePadding = 6;
+    private final static int livePadding = 8;
 
     private Texture texture;
 
@@ -15,8 +15,8 @@ public class LiveView extends View {
     public LiveView(float x, float y) {
         super(x, y);
         texture = new Texture(GameResources.LIVE_IMG_PATH);
-        this.width = texture.getWidth();
-        this.height = texture.getHeight();
+        this.width = texture.getWidth() * 2;
+        this.height = texture.getHeight() * 2;
         leftLives = 0;
     }
 
@@ -26,9 +26,9 @@ public class LiveView extends View {
 
     @Override
     public void draw(SpriteBatch batch) {
-        if (leftLives > 0) batch.draw(texture, x + (texture.getWidth() + livePadding), y, width, height);
+        if (leftLives > 0) batch.draw(texture, x + (texture.getWidth() * 2 + livePadding), y, width, height);
         if (leftLives > 1) batch.draw(texture, x, y, width, height);
-        if (leftLives > 2) batch.draw(texture, x + 2 * (texture.getWidth() + livePadding), y, width, height);
+        if (leftLives > 2) batch.draw(texture, x + 2 * (texture.getWidth() * 2 + livePadding), y, width, height);
     }
 
     @Override

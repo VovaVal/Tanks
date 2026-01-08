@@ -32,7 +32,7 @@ public class GameSettings {
     public static final short BULLET_BIT = 2;
     public static final short BRICK_BIT = 4;
     public static final short STEEL_BIT = 8;
-    public static final short EAGLE_BIT = 16;
+    public static final short EAGLE_BIT = 8;
 
     // Типы/виды тайлов
     public static final int TILE_EMPTY = 0;

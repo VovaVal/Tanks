@@ -56,6 +56,8 @@ public class ContactManager {
                     }
                     else if (wall.getType() == GameSettings.TILE_STEEL && !bullet.isEnemyBullet()) {
                         audioManager.hitSteelSound.play();
+                    } else if (wall.getType() == GameSettings.TILE_EAGLE) {
+                        System.out.println("Eagle");
                     }
                 } else if (objA instanceof BulletObject && objB instanceof BulletObject) {
                     BulletObject bullet1;
@@ -83,6 +85,8 @@ public class ContactManager {
 
                     if (bullet.isEnemyBullet() && !tank.isEnemy()) {
                         tank.hit();
+                        tank.setDestroyed(true);
+                        gameScreen.tankLives--;
                     } else if (!bullet.isEnemyBullet() && tank.isEnemy()) {
                         tank.hit();
                     }

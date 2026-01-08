@@ -4,7 +4,7 @@ public class GameResources {
     // Изображения
 
     public static final String BACKGROUND_GAME_IMG_PATH = "textures_imgs/background_game.png";
-    public static final String LIVE_IMG_PATH = "textures/background_game.png";
+    public static final String LIVE_IMG_PATH = "textures_imgs/life.png";
 
     public static final String CONTROLLER_IMG_PATH = "textures_imgs/LargeHandleFilledGrey.png";
     public static final String BACKGROUND_CONTROLLER_IMG_PATH = "textures_imgs/Joystick.png";

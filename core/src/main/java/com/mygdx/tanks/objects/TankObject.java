@@ -27,7 +27,7 @@ public class TankObject extends GameObject {
 
 
     public TankObject(int x, int y, int width, int height, String texturePath, World world,
-                      Boolean enemy) {
+                      Boolean enemy, int livesLeft) {
         super(texturePath, x, y, width, height, GameSettings.TANK_BIT, world, "tank");
 
         lastShotTime = TimeUtils.millis() - GameSettings.SHOOTING_COOL_DOWN;
@@ -44,6 +44,7 @@ public class TankObject extends GameObject {
         } else {
             coolDown = GameSettings.SHOOTING_COOL_DOWN;
         }
+        this.livesLeft = livesLeft;
     }
 
     private boolean canSeePlayer(TankObject player) {

@@ -26,6 +26,7 @@ import com.mygdx.tanks.Effect;
 import com.mygdx.tanks.Tanks;
 import com.mygdx.tanks.components.BackgroundView;
 import com.mygdx.tanks.components.ButtonView;
+import com.mygdx.tanks.components.LiveView;
 import com.mygdx.tanks.components.VirtualJoystick;
 import com.mygdx.tanks.managers.ContactManager;
 import com.mygdx.tanks.objects.BulletObject;
@@ -54,17 +55,24 @@ public class GameScreen extends ScreenAdapter {
     private FitViewport worldViewport;
     private ScreenViewport uiViewport;
 
+    public int tankLives = 3;
+
     ArrayList<BulletObject> bullets;
     ArrayList<WallsObject> walls;
     public ArrayList<WallsObject> wallsToDestroy;
     public ArrayList<TankObject> tanks;
     public ArrayList<Vector2> spawns;
 
+    LiveView liveView;
+
     private int shootPointer = -1; // Отслеживание пальца, который нажал кнопку выстрела
     private int joystickPointer = -1; // Отслеживание пальца, который использует джойстик
 
     private static final int MAX_ENEMIES_ON_MAP = 4;
     private static final int TOTAL_ENEMIES = 10;
+
+    private float respawnTimer = 0f;
+    private static final float RESPAWN_DELAY = 2f;
 
     private int enemiesSpawned = 0;
     private int enemiesKilled = 0;
@@ -75,7 +83,12 @@ public class GameScreen extends ScreenAdapter {
     Texture[] deathFrames;
     ArrayList<Effect> deathEffects;
 
+    Vector2 tankSpawnMain;
+
     Random random;
+
+    private boolean playerDead = false;
+    private boolean playerSpawning = false;
 
 
     public GameScreen(Tanks myGdxGame) {
@@ -108,7 +121,7 @@ public class GameScreen extends ScreenAdapter {
             200, 200,
             GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
             GameResources.TANK_IMG_PATH,
-            myGdxGame.world, false
+            myGdxGame.world, false, 1
         );
 
         uiCamera = new OrthographicCamera();
@@ -158,27 +171,13 @@ public class GameScreen extends ScreenAdapter {
         addMap();
         createWorldBounds();
 
+        liveView = new LiveView(2000, 1000);
+
         for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
             spawnEnemyIfPossible();
         }
 
     }
-
-//    private void createEnemyTanks(int num) {
-//        int delta = GameSettings.MAP_WIDTH / num;
-//
-//        for (int i = 0; i <= num; i++) {
-//            int x = delta * i + (GameSettings.TANK_PIXEL_SIZE / 2) + 80;
-//            int y = 1200;
-//
-//            TankObject tank = new TankObject(
-//                x, y, GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
-//                GameResources.ENEMY_TANK_IMG_PATH, myGdxGame.world, true
-//            );
-//
-//            tanks.add(tank);
-//        }
-//    }
 
     private void addMap() {
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("1 layout");
@@ -228,6 +227,10 @@ public class GameScreen extends ScreenAdapter {
                             type = GameSettings.TILE_SPAWN;
                             spawns.add(new Vector2(worldX, worldY));
                             break;
+                        case "7":
+                            System.out.println("Spawn main");
+                            tankSpawnMain = new Vector2(worldX, worldY);
+                            break;
                     }
 
                     if (type == 0 || type == 6) continue;
@@ -269,22 +272,63 @@ public class GameScreen extends ScreenAdapter {
         deathEffects.add(effect);
     }
 
+//    private void updateSpawnEffects(float delta) {
+//        for (int i = 0; i < spawnEffects.size(); i++) {
+//            Effect effect = spawnEffects.get(i);
+//            effect.update(delta);
+//
+//            if (effect.finished) {
+//                TankObject tank = new TankObject(
+//                    (int) effect.position.x,
+//                    (int) effect.position.y,
+//                    GameSettings.TANK_PIXEL_SIZE,
+//                    GameSettings.TANK_PIXEL_SIZE,
+//                    GameResources.ENEMY_TANK_IMG_PATH,
+//                    myGdxGame.world,
+//                    true, 2
+//                );
+//                tanks.add(tank);
+//
+//                spawnEffects.remove(i--);
+//            }
+//        }
+//    }
+
     private void updateSpawnEffects(float delta) {
         for (int i = 0; i < spawnEffects.size(); i++) {
             Effect effect = spawnEffects.get(i);
             effect.update(delta);
 
             if (effect.finished) {
-                TankObject tank = new TankObject(
-                    (int) effect.position.x,
-                    (int) effect.position.y,
-                    GameSettings.TANK_PIXEL_SIZE,
-                    GameSettings.TANK_PIXEL_SIZE,
-                    GameResources.ENEMY_TANK_IMG_PATH,
-                    myGdxGame.world,
-                    true
-                );
-                tanks.add(tank);
+
+                if (effect.isPlayerSpawn) {
+                    tankObject = new TankObject(
+                        (int) effect.position.x,
+                        (int) effect.position.y,
+                        GameSettings.TANK_PIXEL_SIZE,
+                        GameSettings.TANK_PIXEL_SIZE,
+                        GameResources.TANK_IMG_PATH,
+                        myGdxGame.world,
+                        false,
+                        1
+                    );
+
+                    playerDead = false;
+                    playerSpawning = false;
+
+                } else {
+                    TankObject enemy = new TankObject(
+                        (int) effect.position.x,
+                        (int) effect.position.y,
+                        GameSettings.TANK_PIXEL_SIZE,
+                        GameSettings.TANK_PIXEL_SIZE,
+                        GameResources.ENEMY_TANK_IMG_PATH,
+                        myGdxGame.world,
+                        true,
+                        2
+                    );
+                    tanks.add(enemy);
+                }
 
                 spawnEffects.remove(i--);
             }
@@ -307,7 +351,9 @@ public class GameScreen extends ScreenAdapter {
 
         updateSpawnEffects(Gdx.graphics.getDeltaTime());
         updateDeathEffects(Gdx.graphics.getDeltaTime());
+        updatePlayerRespawn(Gdx.graphics.getDeltaTime());
 
+        liveView.setLeftLives(tankLives);
         joystick.update();
         updateBullets();
         updateWalls();
@@ -316,6 +362,48 @@ public class GameScreen extends ScreenAdapter {
         myGdxGame.stepWorld();
 
         draw();
+    }
+
+    private void updatePlayerRespawn(float delta) {
+        if (tankObject == null) return;
+
+        if (tankObject.isDestroyed() && !playerDead) {
+            playerDead = true;
+            respawnTimer = 0f;
+
+            playDeath(tankObject);
+
+            Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
+            effect.isPlayerSpawn = true;
+            spawnEffects.add(effect);
+
+            playerSpawning = true;
+
+            myGdxGame.world.destroyBody(tankObject.body);
+        }
+
+        if (playerDead) {
+            respawnTimer += delta;
+
+            if (respawnTimer >= RESPAWN_DELAY) {
+                respawnPlayer();
+                playerDead = false;
+                respawnTimer = 0f;
+            }
+        }
+    }
+
+
+    private void respawnPlayer() {
+        tankObject = new TankObject(
+            (int) tankSpawnMain.x,
+            (int) tankSpawnMain.y,
+            GameSettings.TANK_PIXEL_SIZE,
+            GameSettings.TANK_PIXEL_SIZE,
+            GameResources.TANK_IMG_PATH,
+            myGdxGame.world,
+            false, 1
+        );
     }
 
     private void createWorldBounds() {
@@ -365,12 +453,12 @@ public class GameScreen extends ScreenAdapter {
 
                 switch (gameSession.state) {
                     case PLAYING:
-                        if (shootPointer == -1 && shootButton.isHit(touchPos.x, touchPos.y)) {
+                        if (shootPointer == -1 && shootButton.isHit(touchPos.x, touchPos.y) && !playerDead) {
                             shootPointer = i;  // Запоминаем, какой палец нажал кнопку
                             System.out.println("Shoot button pressed!");
                         }
 
-                        if (shootPointer == i) {
+                        if (shootPointer == i && !playerDead) {
                             if (tankObject.canShoot()) {
                                 tankObject.shoot();
                                 myGdxGame.audioManager.shoot.play();
@@ -416,7 +504,7 @@ public class GameScreen extends ScreenAdapter {
                             System.out.println("Joystick pressed!");
                         }
 
-                        if (joystickPointer == i) {
+                        if (joystickPointer == i && !playerDead) {
                             Vector2 dir = joystick.getDirection();
 
                             if (dir.len() > 0) {
@@ -560,7 +648,7 @@ public class GameScreen extends ScreenAdapter {
             effect.draw(myGdxGame.batch);
         }
 
-        tankObject.draw(myGdxGame.batch);
+        if (!tankObject.isDestroyed()) tankObject.draw(myGdxGame.batch);
         for (TankObject tank : tanks) tank.draw(myGdxGame.batch);
         for (WallsObject wall : walls) wall.draw(myGdxGame.batch);
         for (BulletObject bullet : bullets) bullet.draw(myGdxGame.batch);
@@ -575,6 +663,7 @@ public class GameScreen extends ScreenAdapter {
 
         joystick.draw(myGdxGame.batch);
         shootButton.draw(myGdxGame.batch);
+        liveView.draw(myGdxGame.batch);
 
         myGdxGame.batch.end();
     }
@@ -593,7 +682,7 @@ public class GameScreen extends ScreenAdapter {
             200, 200,
             GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
             GameResources.TANK_IMG_PATH,
-            myGdxGame.world, false
+            myGdxGame.world, false, 1
         );
 
         for (TankObject tank : tanks) {
@@ -607,6 +696,8 @@ public class GameScreen extends ScreenAdapter {
         bullets.clear();
         tanks.clear();
 
+        tankLives = 3;
+
         for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
             spawnEnemyIfPossible();
         }
@@ -616,6 +707,12 @@ public class GameScreen extends ScreenAdapter {
 
         enemiesSpawned = 0;
         enemiesKilled = 0;
+
+        liveView.setLeftLives(3);
+
+        Vector2 tankSpawnMain;
+        playerDead = false;
+        playerSpawning = false;
 
         gameSession.startGame();
     }

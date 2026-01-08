@@ -12,6 +12,7 @@ public class Effect {
     public boolean finished;
     public Vector2 position;
     private float size;
+    public boolean isPlayerSpawn = false;
 
     public Effect(Texture[] frames, Vector2 position, float frameTime, float size) {
         this.frames = frames;

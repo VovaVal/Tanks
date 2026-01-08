@@ -61,6 +61,7 @@
  <tile id="65" type="tank"/>
  <tile id="66" type="3"/>
  <tile id="67" type="5"/>
+ <tile id="68" type="7"/>
  <tile id="69" type="4"/>
  <tile id="75" type="tank"/>
  <tile id="76" type="tank"/>
