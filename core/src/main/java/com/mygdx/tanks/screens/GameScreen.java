@@ -116,12 +116,12 @@ public class GameScreen extends ScreenAdapter {
         bullets = new ArrayList<>();
         walls = new ArrayList<>();
         tanks = new ArrayList<>();
-        createEnemyTanks(4);
+
         wallsToDestroy = new ArrayList<>();
 
-        createWorldBounds();
-
         addMap();
+        createWorldBounds();
+        createEnemyTanks(4);
     }
 
     private void createEnemyTanks(int num) {
@@ -129,7 +129,7 @@ public class GameScreen extends ScreenAdapter {
 
         for (int i = 0; i <= num; i++) {
             int x = delta * i + (GameSettings.TANK_PIXEL_SIZE / 2) + 80;
-            int y =  -80 + GameSettings.MAP_HEIGHT - (GameSettings.TANK_PIXEL_SIZE / 2);
+            int y = 1200;
 
             TankObject tank = new TankObject(
                 x, y, GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
@@ -224,7 +224,7 @@ public class GameScreen extends ScreenAdapter {
         float thickness = 20f;
 
         createStaticWall(w / 2, -thickness / 2, w, thickness);       // низ
-        createStaticWall(w / 2, h + thickness / 2, w, thickness);    // верх
+        // createStaticWall(w / 2, h + thickness / 2, w, thickness);    // верх
         createStaticWall(-thickness / 2, h / 2, thickness, h);       // лево
         createStaticWall(w + thickness / 2, h / 2, thickness, h);    // право
     }
@@ -482,6 +482,14 @@ public class GameScreen extends ScreenAdapter {
             GameResources.TANK_IMG_PATH,
             myGdxGame.world, false
         );
+
+        for (TankObject tank : tanks) {
+            myGdxGame.world.destroyBody(tank.body);
+        }
+
+        for (BulletObject bullet : bullets) {
+            myGdxGame.world.destroyBody(bullet.body);
+        }
 
         bullets.clear();
         tanks.clear();
