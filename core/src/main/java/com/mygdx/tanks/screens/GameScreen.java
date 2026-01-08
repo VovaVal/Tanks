@@ -224,7 +224,7 @@ public class GameScreen extends ScreenAdapter {
         float thickness = 20f;
 
         createStaticWall(w / 2, -thickness / 2, w, thickness);       // низ
-        // createStaticWall(w / 2, h + thickness / 2, w, thickness);    // верх
+        createStaticWall(w / 2, h + thickness / 2, w, thickness);    // верх
         createStaticWall(-thickness / 2, h / 2, thickness, h);       // лево
         createStaticWall(w + thickness / 2, h / 2, thickness, h);    // право
     }
