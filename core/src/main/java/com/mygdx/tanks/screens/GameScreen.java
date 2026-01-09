@@ -658,6 +658,8 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void show() {
+        myGdxGame.audioManager.startSound.play();
+        myGdxGame.audioManager.backgroundMusicGame.play();
         restartGame();
     }
 
@@ -690,15 +692,13 @@ public class GameScreen extends ScreenAdapter {
             spawnEnemyIfPossible();
         }
 
-        myGdxGame.audioManager.startSound.play();
-        myGdxGame.audioManager.backgroundMusicGame.play();
-
         enemiesSpawned = 0;
         enemiesKilled = 0;
 
         liveView.setLeftLives(3);
 
-        Vector2 tankSpawnMain;
+        // Vector2 tankSpawnMain;
+
         playerDead = false;
         playerSpawning = false;
 
