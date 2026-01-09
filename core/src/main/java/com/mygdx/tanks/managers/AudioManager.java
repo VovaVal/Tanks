@@ -12,6 +12,7 @@ public class AudioManager {
     public Sound death;
     public Sound startSound;
     public Sound hitSteelSound;
+    public Sound tankDiedMain;
 
     public AudioManager() {
         backgroundMusicGame = Gdx.audio.newMusic(Gdx.files.internal(GameResources.PLAY_SOUND_PATH));
@@ -19,6 +20,7 @@ public class AudioManager {
         death = Gdx.audio.newSound(Gdx.files.internal(GameResources.DEATH_SOUND_PATH));
         startSound = Gdx.audio.newSound(Gdx.files.internal(GameResources.START_SOUND_PATH));
         hitSteelSound = Gdx.audio.newSound(Gdx.files.internal(GameResources.HIT_STEEL_SOUND_PATH));
+        tankDiedMain = Gdx.audio.newSound(Gdx.files.internal(GameResources.TANK_DIED_SOUND_PATH));
 
         backgroundMusicGame.setVolume(0.2f);
         backgroundMusicGame.setLooping(true);

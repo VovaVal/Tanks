@@ -85,8 +85,12 @@ public class ContactManager {
 
                     if (bullet.isEnemyBullet() && !tank.isEnemy()) {
                         tank.hit();
-                        tank.setDestroyed(true);
-                        gameScreen.tankLives--;
+
+                        if (!tank.isAlive()) {
+                            audioManager.tankDiedMain.play();
+                            tank.setDestroyed(true);
+                            gameScreen.tankLives--;
+                        }
                     } else if (!bullet.isEnemyBullet() && tank.isEnemy()) {
                         tank.hit();
                     }

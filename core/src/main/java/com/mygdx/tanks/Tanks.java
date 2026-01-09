@@ -41,13 +41,13 @@ public class Tanks extends Game {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT);
 
-        audioManager = new AudioManager();
-
-        gameScreen = new GameScreen(this);
-
         largeWhiteFont = FontBuilder.generate(48, Color.WHITE, GameResources.FONT_PATH);
         commonWhiteFont = FontBuilder.generate(24, Color.WHITE, GameResources.FONT_PATH);
         commonBlackFont = FontBuilder.generate(24, Color.BLACK, GameResources.FONT_PATH);
+
+        audioManager = new AudioManager();
+
+        gameScreen = new GameScreen(this);
 
         setScreen(gameScreen);
     }
