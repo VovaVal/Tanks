@@ -123,12 +123,12 @@ public class GameScreen extends ScreenAdapter {
         worldViewport = new FitViewport(mapWidth, mapHeight, gameCamera);
         worldViewport.apply(true);
 
-        tankObject = new TankObject(
-            200, 200,
-            GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
-            GameResources.TANK_IMG_PATH,
-            myGdxGame.world, false, 1
-        );
+//        tankObject = new TankObject(
+//            200, 200,
+//            GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
+//            GameResources.TANK_IMG_PATH,
+//            myGdxGame.world, false, 1
+//        );
 
         uiCamera = new OrthographicCamera();
         uiViewport = new ScreenViewport(uiCamera);
@@ -633,7 +633,7 @@ public class GameScreen extends ScreenAdapter {
             effect.draw(myGdxGame.batch);
         }
 
-        if (!tankObject.isDestroyed()) tankObject.draw(myGdxGame.batch);
+        if (tankObject != null && !tankObject.isDestroyed()) tankObject.draw(myGdxGame.batch);
         for (TankObject tank : tanks) tank.draw(myGdxGame.batch);
         for (WallsObject wall : walls) wall.draw(myGdxGame.batch);
         for (BulletObject bullet : bullets) bullet.draw(myGdxGame.batch);
@@ -667,13 +667,21 @@ public class GameScreen extends ScreenAdapter {
         if (tankObject != null) {
             myGdxGame.world.destroyBody(tankObject.body);
         }
+        tankObject = null;
 
-        tankObject = new TankObject(
-            200, 200,
-            GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
-            GameResources.TANK_IMG_PATH,
-            myGdxGame.world, false, 1
-        );
+        Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
+        effect.isPlayerSpawn = true;
+        spawnEffects.add(effect);
+
+        playerSpawning = true;
+        playerDead = true;
+
+//        tankObject = new TankObject(
+//            200, 200,
+//            GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
+//            GameResources.TANK_IMG_PATH,
+//            myGdxGame.world, false, 1
+//        );
 
         for (TankObject tank : tanks) {
             myGdxGame.world.destroyBody(tank.body);
