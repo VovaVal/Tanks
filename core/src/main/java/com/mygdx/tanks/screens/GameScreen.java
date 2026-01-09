@@ -272,28 +272,6 @@ public class GameScreen extends ScreenAdapter {
         deathEffects.add(effect);
     }
 
-//    private void updateSpawnEffects(float delta) {
-//        for (int i = 0; i < spawnEffects.size(); i++) {
-//            Effect effect = spawnEffects.get(i);
-//            effect.update(delta);
-//
-//            if (effect.finished) {
-//                TankObject tank = new TankObject(
-//                    (int) effect.position.x,
-//                    (int) effect.position.y,
-//                    GameSettings.TANK_PIXEL_SIZE,
-//                    GameSettings.TANK_PIXEL_SIZE,
-//                    GameResources.ENEMY_TANK_IMG_PATH,
-//                    myGdxGame.world,
-//                    true, 2
-//                );
-//                tanks.add(tank);
-//
-//                spawnEffects.remove(i--);
-//            }
-//        }
-//    }
-
     private void updateSpawnEffects(float delta) {
         for (int i = 0; i < spawnEffects.size(); i++) {
             Effect effect = spawnEffects.get(i);
@@ -371,15 +349,17 @@ public class GameScreen extends ScreenAdapter {
             playerDead = true;
             respawnTimer = 0f;
 
+            tankObject.disablePhysics();
+
             playDeath(tankObject);
+
+            myGdxGame.world.destroyBody(tankObject.body);
 
             Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
             effect.isPlayerSpawn = true;
             spawnEffects.add(effect);
 
             playerSpawning = true;
-
-            myGdxGame.world.destroyBody(tankObject.body);
         }
 
         if (playerDead) {

@@ -3,6 +3,7 @@ package com.mygdx.tanks.objects;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.tanks.GameSettings;
@@ -81,7 +82,6 @@ public class TankObject extends GameObject {
         );
     }
 
-
     private void chooseRandomDirection() {
         int dir = (int)(Math.random() * 4);
         switch(dir) {
@@ -102,6 +102,13 @@ public class TankObject extends GameObject {
         } else {
             stop();
         }
+    }
+
+    public void disablePhysics() {
+        for (Fixture fixture : body.getFixtureList()) {
+            fixture.setSensor(true);
+        }
+        body.setLinearVelocity(0, 0);
     }
 
     public boolean isEnemy() {
