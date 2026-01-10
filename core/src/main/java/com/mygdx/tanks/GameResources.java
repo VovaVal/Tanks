@@ -28,4 +28,5 @@ public class GameResources {
     public static final String START_SOUND_PATH = "sounds/start_sound.mp3";
     public static final String HIT_STEEL_SOUND_PATH = "sounds/hit_steel_sound.mp3";
     public static final String TANK_DIED_SOUND_PATH = "sounds/tank_died_sound.mp3";
+    public static final String BTN_CLICK_SOUND_PATH = "sounds/btn_click.mp3";
 }

@@ -448,6 +448,12 @@ public class GameScreen extends ScreenAdapter {
                             System.out.println("Shoot button pressed!");
                         }
 
+                        if (pauseBtnImg.isHit(touchPos.x, touchPos.y)) {
+                            System.out.println("Pause!");
+                            myGdxGame.audioManager.btnClick.play();
+                            gameSession.pauseGame();
+                        }
+
                         if (shootPointer == i && !playerDead) {
                             if (tankObject.canShoot()) {
                                 tankObject.shoot();
