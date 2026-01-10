@@ -30,6 +30,8 @@ public class ContactManager {
                 Fixture fixA = contact.getFixtureA();
                 Fixture fixB = contact.getFixtureB();
 
+                if (fixA.getUserData() == null || fixB.getUserData() == null) return;
+
                 Object objA = fixA.getUserData();
                 Object objB = fixB.getUserData();
 
