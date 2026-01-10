@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.tanks.GameSettings;
 
 public class TankObject extends GameObject {
-    private long lastShotTime;
+    public long lastShotTime;
     private int livesLeft = 3;
     public int angleDeg = 360;
     private boolean enemy;

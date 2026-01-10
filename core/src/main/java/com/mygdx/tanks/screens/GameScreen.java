@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.tanks.GameResources;
@@ -547,6 +548,9 @@ public class GameScreen extends ScreenAdapter {
                         if (continueButton.isHit(touchPos.x, touchPos.y)) {
                             GameSession.state = GameState.PLAYING;
                             myGdxGame.audioManager.btnClick.play();
+                            for (TankObject tank: tanks) {
+                                tank.lastShotTime = TimeUtils.millis();
+                            }
                         }
 
                         break;
