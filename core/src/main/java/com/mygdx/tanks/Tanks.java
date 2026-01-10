@@ -8,8 +8,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.tanks.managers.AudioManager;
 import com.mygdx.tanks.screens.GameScreen;
 
@@ -47,9 +49,9 @@ public class Tanks extends Game {
         commonWhiteFont = FontBuilder.generate(24, Color.WHITE, GameResources.FONT_PATH);
         commonBlackFont = FontBuilder.generate(24, Color.BLACK, GameResources.FONT_PATH);
 
-        gameScreen = new GameScreen(this);
+        // gameScreen = new GameScreen(this);
 
-        setScreen(gameScreen);
+        setScreen(new GameScreen(this));
     }
 
     public void stepWorld() {
@@ -60,6 +62,26 @@ public class Tanks extends Game {
             accumulator -= STEP_TIME;
             world.step(STEP_TIME, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
         }
+    }
+
+    public void resetWorld() {
+        // Уничтожаем все тела в мире
+        if (world != null) {
+            // Получаем список всех тел
+            Array<Body> bodies = new Array<>();
+            world.getBodies(bodies);
+
+            // Уничтожаем каждое тело
+            for (Body body : bodies) {
+                world.destroyBody(body);
+            }
+
+            // Очищаем контакт-листенер
+            world.setContactListener(null);
+        }
+
+        // Создаем новый мир
+        world = new World(new Vector2(0, 0), true);
     }
 
     @Override
