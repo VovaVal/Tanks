@@ -131,13 +131,6 @@ public class GameScreen extends ScreenAdapter {
         worldViewport = new FitViewport(mapWidth, mapHeight, gameCamera);
         worldViewport.apply(true);
 
-//        tankObject = new TankObject(
-//            200, 200,
-//            GameSettings.TANK_PIXEL_SIZE, GameSettings.TANK_PIXEL_SIZE,
-//            GameResources.TANK_IMG_PATH,
-//            myGdxGame.world, false, 1
-//        );
-
         uiCamera = new OrthographicCamera();
         uiViewport = new ScreenViewport(uiCamera);
         uiViewport.apply(true);
@@ -159,7 +152,7 @@ public class GameScreen extends ScreenAdapter {
         tanksKilledText = new TextView(myGdxGame.largeWhiteFont, 1800, 1000, "0");
         tanksAllText = new TextView(myGdxGame.largeWhiteFont, 1830, 1000, " / " + Integer.toString(TOTAL_ENEMIES));
         enemyTankImg = new ImageView(1730, 990, GameResources.ENEMY_TANK_IMG_PATH, 50, 50);
-        pauseBtnImg = new ImageView(0, 870, GameResources.PAUSE_BTN_IMG_PATH, 250, 220);
+        pauseBtnImg = new ImageView(0, 870, GameResources.PAUSE_BTN_IMG_PATH, 280, 220);
 
         fullBlackoutView = new ImageView(0, 0, GameResources.BLACKOUT_FULL_IMG_PATH, 3000, 1100);
 
