@@ -23,6 +23,7 @@ import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.GameSession;
 import com.mygdx.tanks.GameSettings;
 import com.mygdx.tanks.Effect;
+import com.mygdx.tanks.GameState;
 import com.mygdx.tanks.Tanks;
 import com.mygdx.tanks.components.BackgroundView;
 import com.mygdx.tanks.components.ButtonView;
@@ -97,6 +98,11 @@ public class GameScreen extends ScreenAdapter {
     ImageView enemyTankImg;
     ImageView pauseBtnImg;
 
+    ImageView fullBlackoutView;
+    TextView pauseTextView;
+    ButtonView continueButton;
+    ButtonView homeButton;
+
 
     public GameScreen(Tanks myGdxGame) {
         this.myGdxGame = myGdxGame;
@@ -153,6 +159,21 @@ public class GameScreen extends ScreenAdapter {
         tanksAllText = new TextView(myGdxGame.largeWhiteFont, 1830, 1000, " / " + Integer.toString(TOTAL_ENEMIES));
         enemyTankImg = new ImageView(1730, 990, GameResources.ENEMY_TANK_IMG_PATH, 50, 50);
         pauseBtnImg = new ImageView(0, 870, GameResources.PAUSE_BTN_IMG_PATH, 250, 220);
+
+        fullBlackoutView = new ImageView(0, 0, GameResources.BLACKOUT_FULL_IMG_PATH, 3000, 1100);
+
+        pauseTextView = new TextView(
+            myGdxGame.largeWhiteFont,
+            1100,
+            800,
+            "Pause"
+        );
+        continueButton = new ButtonView(550, 450,
+            600, 300,
+            myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "Continue");
+        homeButton = new ButtonView(1185, 450,
+            600, 300,
+            myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "Home");
 
         bullets = new ArrayList<>();
         walls = new ArrayList<>();
@@ -331,6 +352,13 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
+    @Override
+    public void pause() {
+        if (gameSession.state == GameState.PLAYING) {
+            gameSession.pauseGame();
+        }
+    }
+
     public void render(float delta) {
         handleInput();
 
@@ -340,12 +368,12 @@ public class GameScreen extends ScreenAdapter {
 
         liveView.setLeftLives(tankLives);
         tanksKilledText.setText(String.valueOf(enemiesKilled));
-        joystick.update();
-        updateBullets();
-        updateWalls();
-        updateEnemyTanks();
+        if (gameSession.state == GameState.PLAYING) joystick.update();
+        if (gameSession.state == GameState.PLAYING) updateBullets();
+        if (gameSession.state == GameState.PLAYING) updateWalls();
+        if (gameSession.state == GameState.PLAYING) updateEnemyTanks();
 
-        myGdxGame.stepWorld();
+        if (gameSession.state == GameState.PLAYING) myGdxGame.stepWorld();
 
         draw();
     }
@@ -376,24 +404,10 @@ public class GameScreen extends ScreenAdapter {
             respawnTimer += delta;
 
             if (respawnTimer >= RESPAWN_DELAY) {
-                respawnPlayer();
                 playerDead = false;
                 respawnTimer = 0f;
             }
         }
-    }
-
-
-    private void respawnPlayer() {
-//        tankObject = new TankObject(
-//            (int) tankSpawnMain.x,
-//            (int) tankSpawnMain.y,
-//            GameSettings.TANK_PIXEL_SIZE,
-//            GameSettings.TANK_PIXEL_SIZE,
-//            GameResources.TANK_IMG_PATH,
-//            myGdxGame.world,
-//            false, 1
-//        );
     }
 
     private void createWorldBounds() {
@@ -454,7 +468,7 @@ public class GameScreen extends ScreenAdapter {
                             gameSession.pauseGame();
                         }
 
-                        if (shootPointer == i && !playerDead) {
+                        if (shootPointer == i && !playerDead && tankObject != null && gameSession.state == GameState.PLAYING) {
                             if (tankObject.canShoot()) {
                                 tankObject.shoot();
                                 myGdxGame.audioManager.shoot.play();
@@ -500,7 +514,7 @@ public class GameScreen extends ScreenAdapter {
                             System.out.println("Joystick pressed!");
                         }
 
-                        if (joystickPointer == i && !playerDead) {
+                        if (joystickPointer == i && !playerDead && tankObject != null && gameSession.state == GameState.PLAYING) {
                             Vector2 dir = joystick.getDirection();
 
                             if (dir.len() > 0) {
@@ -529,6 +543,12 @@ public class GameScreen extends ScreenAdapter {
 
                     case PAUSED:
                         System.out.println("Pause");
+
+                        if (continueButton.isHit(touchPos.x, touchPos.y)) {
+                            GameSession.state = GameState.PLAYING;
+                            myGdxGame.audioManager.btnClick.play();
+                        }
+
                         break;
 
                     case ENDED:
@@ -662,6 +682,13 @@ public class GameScreen extends ScreenAdapter {
         enemyTankImg.draw(myGdxGame.batch);
         pauseBtnImg.draw(myGdxGame.batch);
 
+        if (gameSession.state == GameState.PAUSED) {
+            fullBlackoutView.draw(myGdxGame.batch);
+            pauseTextView.draw(myGdxGame.batch);
+            continueButton.draw(myGdxGame.batch);
+            homeButton.draw(myGdxGame.batch);
+        }
+
         myGdxGame.batch.end();
     }
 
@@ -678,12 +705,11 @@ public class GameScreen extends ScreenAdapter {
         }
         tankObject = null;
 
+        playerSpawning = true;
+        playerDead = true;
         Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
         effect.isPlayerSpawn = true;
         spawnEffects.add(effect);
-
-        playerSpawning = true;
-        playerDead = true;
 
 //        tankObject = new TankObject(
 //            200, 200,

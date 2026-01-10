@@ -23,6 +23,15 @@ public class TextView extends View{
         height = glyphLayout.height;
     }
 
+    public TextView(BitmapFont font, float x, float y, String text, int width, int height) {
+        this(font, x, y);
+        this.text = text;
+
+        GlyphLayout glyphLayout = new GlyphLayout(font, text);
+        this.width = width;
+        this.height = height;
+    }
+
     public void setText(String text) {
         this.text = text;
         GlyphLayout glyphLayout = new GlyphLayout(font, text);
