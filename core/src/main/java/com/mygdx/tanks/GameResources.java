@@ -18,6 +18,7 @@ public class GameResources {
     public static final String FOREST_IMG_PATH = "textures_imgs/forest.png";
     public static final String WATER_IMG_PATH = "textures_imgs/water.png";
     public static final String SPAWN_IMG_PATH = "textures_imgs/spawn.png";
+    public static final String PAUSE_BTN_IMG_PATH = "textures_imgs/pause_btn.png";
 
     public static final String FONT_PATH = "fonts/Montserrat-Bold.ttf";
 

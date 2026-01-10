@@ -95,6 +95,7 @@ public class GameScreen extends ScreenAdapter {
     TextView tanksKilledText;
     TextView tanksAllText;
     ImageView enemyTankImg;
+    ImageView pauseBtnImg;
 
 
     public GameScreen(Tanks myGdxGame) {
@@ -151,6 +152,7 @@ public class GameScreen extends ScreenAdapter {
         tanksKilledText = new TextView(myGdxGame.largeWhiteFont, 1800, 1000, "0");
         tanksAllText = new TextView(myGdxGame.largeWhiteFont, 1830, 1000, " / " + Integer.toString(TOTAL_ENEMIES));
         enemyTankImg = new ImageView(1730, 990, GameResources.ENEMY_TANK_IMG_PATH, 50, 50);
+        pauseBtnImg = new ImageView(0, 870, GameResources.PAUSE_BTN_IMG_PATH, 250, 220);
 
         bullets = new ArrayList<>();
         walls = new ArrayList<>();
@@ -652,6 +654,7 @@ public class GameScreen extends ScreenAdapter {
         tanksKilledText.draw(myGdxGame.batch);
         tanksAllText.draw(myGdxGame.batch);
         enemyTankImg.draw(myGdxGame.batch);
+        pauseBtnImg.draw(myGdxGame.batch);
 
         myGdxGame.batch.end();
     }
