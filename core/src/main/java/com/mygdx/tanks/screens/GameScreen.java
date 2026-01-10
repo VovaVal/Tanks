@@ -594,16 +594,14 @@ public class GameScreen extends ScreenAdapter {
 
                         if (continueButton2.isHit(touchPos.x, touchPos.y)) {
 
-                            dispose();
+//                            dispose();
                             myGdxGame.audioManager.btnClick.play();
-                            myGdxGame.resetWorld();
-//                            gameSession.state = GameState.PLAYING;
-                            // myGdxGame.resetWorld();
+                            restart();
+//                            myGdxGame.resetWorld();
 //                            isRestarting = true;
-//                            myGdxGame.setScreen(new GameScreen(myGdxGame));
-                            Gdx.app.postRunnable(() -> {
-                                myGdxGame.setScreen(new GameScreen(myGdxGame));
-                            });
+//                            Gdx.app.postRunnable(() -> {
+//                                myGdxGame.setScreen(new GameScreen(myGdxGame));
+//                            });
                             return;
                         }
                         break;
@@ -755,176 +753,83 @@ public class GameScreen extends ScreenAdapter {
         myGdxGame.audioManager.backgroundMusicGame.play();
     }
 
-//    private void restartGame() {
-//        if (tankObject != null) {
-//            myGdxGame.world.destroyBody(tankObject.body);
-//        }
-//
-//        tankObject = null;
-//
-//        spawns.clear();
-//
-//
-////        playerSpawning = true;
-////        playerDead = true;
-////        Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
-////        effect.isPlayerSpawn = true;
-////        spawnEffects.add(effect);
-//
-//        for (TankObject tank : tanks) {
-//            myGdxGame.world.destroyBody(tank.body);
-//        }
-//
-//        for (BulletObject bullet : bullets) {
-//            myGdxGame.world.destroyBody(bullet.body);
-//        }
-//
-//        bullets.clear();
-//        tanks.clear();
-//        wallsToDestroy.clear();
-//
-//        tankLives = 3;
-//
-//        for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
-//            spawnEnemyIfPossible();
-//        }
-//
-//        playerSpawning = true;
-//        playerDead = true;
-//        Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
-//        effect.isPlayerSpawn = true;
-//        spawnEffects.add(effect);
-//
-//        enemiesSpawned = 4;
-//        enemiesKilled = 0;
-//
-//        liveView.setLeftLives(3);
-//
-//        // Vector2 tankSpawnMain;
-//
-//        playerDead = false;
-//        playerSpawning = false;
-//
-//        gameSession.startGame();
-//    }
+    public void restart() {
+        System.out.println("Restarting game...");
 
-//    private void restartGame() {
-//        // уничтожаем игрока
-//        if (tankObject != null && tankObject.body != null) {
-//            myGdxGame.world.destroyBody(tankObject.body);
-//        }
-//        tankObject = null;
-//
-//        // уничтожаем врагов
-//        for (TankObject tank : tanks) {
-//            if (tank.body != null) myGdxGame.world.destroyBody(tank.body);
-//        }
-//
-//        // уничтожаем пули
-//        for (BulletObject bullet : bullets) {
-//            if (bullet.body != null) myGdxGame.world.destroyBody(bullet.body);
-//        }
-//
-//        for (WallsObject wall : walls) {
-//            if (wall.body != null) {
-//                myGdxGame.world.destroyBody(wall.body);
-//            }
-//        }
-//
-//        bullets.clear();
-//        tanks.clear();
-//        wallsToDestroy.clear();
-//        walls.clear();
-//        spawnEffects.clear();
-//        deathEffects.clear();
-//
-//        spawns.clear();
-//        addMap();
-//        createWorldBounds();
-//
-//        enemiesKilled = 0;
-//        tankLives = 3;
-//        liveView.setLeftLives(tankLives);
-//
-//        for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
-//            spawnEnemyIfPossible();
-//        }
-//        enemiesSpawned = 4;
-//
-//        playerDead = true;
-//        playerSpawning = true;
-//        Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
-//        effect.isPlayerSpawn = true;
-//        spawnEffects.add(effect);
-//
-//        gameSession.startGame();
-//    }
+        myGdxGame.audioManager.backgroundMusicGame.stop();
 
-//        private void restartGame() {
-//            if (tankObject != null) myGdxGame.world.destroyBody(tankObject.body);
-//            tankObject = null;
-//
-//            for (TankObject tank : tanks) {
-//                myGdxGame.world.destroyBody(tank.body);
-//            }
-//
-//            for (BulletObject bullet : bullets) {
-//                myGdxGame.world.destroyBody(bullet.body);
-//            }
-//
-//            for (WallsObject wall : walls) {
-//                myGdxGame.world.destroyBody(wall.body);
-//            }
-//
-//            tanks.clear();
-//            bullets.clear();
-//            walls.clear();
-//            spawnEffects.clear();
-//            deathEffects.clear();
-//            spawns.clear();
-//
-//            shootPointer = -1;
-//            joystickPointer = -1;
-//
-//            Gdx.app.postRunnable(() -> {
-//                addMap();
-//                createWorldBounds();
-//
-//                enemiesKilled = 0;
-//                tankLives = 3;
-//                liveView.setLeftLives(tankLives);
-//
-//                for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
-//                    spawnEnemyIfPossible();
-//                }
-//                enemiesSpawned = 4;
-//
-//                playerDead = true;
-//                playerSpawning = true;
-//                Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
-//                effect.isPlayerSpawn = true;
-//                spawnEffects.add(effect);
-//
-//                gameSession.startGame();
-//            });
-//        }
+        disposeCurrentState();
+        initializeGame();
 
+        gameSession.startGame();
+        myGdxGame.audioManager.startSound.play();
+        myGdxGame.audioManager.backgroundMusicGame.play();
+    }
 
-//    @Override
-//    public void dispose() {
-//        map.dispose();
-//        renderer.dispose();
-//        joystick.dispose();
-//        spawnMarkerTexture.dispose();
-//    }
+    private void disposeCurrentState() {
+        destroyAllBodies();
+
+        if (bullets != null) bullets.clear();
+        if (tanks != null) tanks.clear();
+        if (walls != null) walls.clear();
+        if (spawnEffects != null) spawnEffects.clear();
+        if (deathEffects != null) deathEffects.clear();
+        if (spawns != null) spawns.clear();
+
+        tankObject = null;
+        shootPointer = -1;
+        joystickPointer = -1;
+
+        playerDead = false;
+        playerSpawning = false;
+        enemiesKilled = 0;
+        enemiesSpawned = 0;
+        tankLives = 3;
+    }
+
+    private void destroyAllBodies() {
+        try {
+            com.badlogic.gdx.utils.Array<Body> bodies = new com.badlogic.gdx.utils.Array<>();
+            myGdxGame.world.getBodies(bodies);
+
+            for (Body body : bodies) {
+                Fixture fixture = body.getFixtureList().first();
+                if (fixture != null && "WORLD_BOUND".equals(fixture.getUserData())) {
+                    continue;
+                }
+                myGdxGame.world.destroyBody(body);
+            }
+        } catch (Exception e) {
+            System.err.println("Error destroying bodies: " + e.getMessage());
+        }
+    }
+
+    private void initializeGame() {
+        map = new TmxMapLoader().load("maps/map_2.tmx");
+        renderer = new OrthogonalTiledMapRenderer(map);
+
+        addMap();
+
+        createWorldBounds();
+
+        for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
+            spawnEnemyIfPossible();
+        }
+
+        playerSpawning = true;
+        Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
+        effect.isPlayerSpawn = true;
+        spawnEffects.add(effect);
+
+        liveView.setLeftLives(tankLives);
+        tanksKilledText.setText("0 ");
+    }
 
     @Override
     public void dispose() {
-        // 1. Tiled карта и рендерер
         if (map != null) map.dispose();
         if (renderer != null) renderer.dispose();
 
-        // 2. Текстуры из компонентов
         if (joystick != null) joystick.dispose();
         if (shootButton != null) shootButton.dispose();
         if (backgroundView != null) backgroundView.dispose();
@@ -933,17 +838,11 @@ public class GameScreen extends ScreenAdapter {
         if (enemyTankImg != null) enemyTankImg.dispose();
         if (fullBlackoutView != null) fullBlackoutView.dispose();
 
-        // 3. Эффекты (анимации спавна/смерти)
         for (Texture tex : spawnFrames) {
             if (tex != null) tex.dispose();
         }
         for (Texture tex : deathFrames) {
             if (tex != null) tex.dispose();
         }
-
-        // 4. Стены и объекты (их текстуры)
-//        for (WallsObject wall : walls) {
-//            if (wall != null) wall.dispose(); // должен вызывать texture.dispose()
-//        }
         }
 }
