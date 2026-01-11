@@ -116,6 +116,7 @@ public class GameScreen extends ScreenAdapter {
     Boolean restarting;
     public Boolean drawFlag = false;
     public long timeToDie;
+    String mapPath;
 
 
     public GameScreen(Tanks myGdxGame) {
@@ -128,7 +129,7 @@ public class GameScreen extends ScreenAdapter {
 
         backgroundView = new BackgroundView(GameResources.BACKGROUND_GAME_IMG_PATH);
 
-        map = new TmxMapLoader().load("maps/map_2.tmx");  // карта
+        map = new TmxMapLoader().load("maps/map_1.tmx");  // карта
         renderer = new OrthogonalTiledMapRenderer(map);
 
         float mapWidth = GameSettings.MAP_WIDTH;
@@ -606,7 +607,7 @@ public class GameScreen extends ScreenAdapter {
 
                         if (continueButton2.isHit(touchPos.x, touchPos.y)) {
                             myGdxGame.audioManager.btnClick.play();
-                            restart();
+                            restart(mapPath);
                             return;
                         } else if (homeButton2.isHit(touchPos.x, touchPos.y)) {
                             gameSession.state = GameState.ENDED;
@@ -774,8 +775,10 @@ public class GameScreen extends ScreenAdapter {
         // myGdxGame.audioManager.backgroundMusicGame.play();
     }
 
-    public void restart() {
+    public void restart(String path) {
         System.out.println("Restarting game...");
+
+        mapPath = path;
 
         myGdxGame.audioManager.backgroundMusicGame.stop();
 
@@ -786,7 +789,7 @@ public class GameScreen extends ScreenAdapter {
         contactManager = new ContactManager(myGdxGame.world, this, myGdxGame.audioManager, gameSession);
 
         clearLogicalState();
-        initializeGame();
+        initializeGame(path);
 
         gameSession.startGame();
         myGdxGame.audioManager.startSound.play();
@@ -858,8 +861,8 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
-    private void initializeGame() {
-        map = new TmxMapLoader().load("maps/map_2.tmx");
+    private void initializeGame(String path) {
+        map = new TmxMapLoader().load(path);
         renderer = new OrthogonalTiledMapRenderer(map);
 
         addMap();
