@@ -390,45 +390,56 @@ public class GameScreen extends ScreenAdapter {
 //        myGdxGame.audioManager.death.play();
 //    }
 
+//    public void activateGrenade() {
+//        System.out.println("Grenade was activated!");
+//
+//        int killedByGrenade = 0;
+//
+//        for (int i = tanks.size() - 1; i >= 0; i--) {
+//            TankObject enemy = tanks.get(i);
+//            if (enemy != null && enemy.isEnemy() && !enemy.isDestroyed()) {
+//                playDeath(enemy);
+//
+//                if (enemy.body != null && enemy.body.getWorld() != null) {
+//                    myGdxGame.world.destroyBody(enemy.body);
+//                }
+//
+//                killedByGrenade++;
+//                enemiesKilled++;
+//
+//                tanks.remove(i);
+//            }
+//        }
+//
+//        enemiesSpawned -= killedByGrenade;
+//
+//        enemiesSpawned = Math.max(0, enemiesSpawned);
+//        enemiesKilled = Math.min(enemiesKilled, TOTAL_ENEMIES);
+//
+//        System.out.println("Граната убила " + killedByGrenade + " врагов. Всего убито: " + enemiesKilled + "/" + TOTAL_ENEMIES);
+//
+//        myGdxGame.audioManager.death.play();
+//    }
+
     public void activateGrenade() {
         System.out.println("Grenade was activated!");
 
-        // Запоминаем, сколько врагов было уничтожено
         int killedByGrenade = 0;
 
-        // Используем итератор для безопасного удаления
-        for (int i = tanks.size() - 1; i >= 0; i--) {
-            TankObject enemy = tanks.get(i);
-            if (enemy != null && enemy.isEnemy() && !enemy.isDestroyed()) {
-                // Создаем эффект смерти
+        for (TankObject enemy : tanks) {
+            if (enemy.isEnemy() && !enemy.isDestroyed()) {
+                enemy.markForDestroy();
                 playDeath(enemy);
-
-                // Уничтожаем тело танка (с проверкой)
-                if (enemy.body != null && enemy.body.getWorld() != null) {
-                    myGdxGame.world.destroyBody(enemy.body);
-                }
-
-                // Увеличиваем счетчики
                 killedByGrenade++;
-                enemiesKilled++;
-
-                // Удаляем танк из списка
-                tanks.remove(i);
             }
         }
 
-        // Уменьшаем счетчик заспавненных врагов на количество убитых гранатой
         enemiesSpawned -= killedByGrenade;
-
-        // Проверяем, чтобы счетчики не ушли в минус
         enemiesSpawned = Math.max(0, enemiesSpawned);
-        enemiesKilled = Math.min(enemiesKilled, TOTAL_ENEMIES);
 
-        System.out.println("Граната убила " + killedByGrenade + " врагов. Всего убито: " + enemiesKilled + "/" + TOTAL_ENEMIES);
-
-        // Звук взрыва
         myGdxGame.audioManager.death.play();
     }
+
 
     private void playDeath(TankObject tank) {
         Vector2 coords = new Vector2((int) tank.getX(), (int) tank.getY());
@@ -881,6 +892,15 @@ public class GameScreen extends ScreenAdapter {
 
     private void updateEnemyTanks() {
         for (int i = 0; i < tanks.size(); i++) {
+            if (tanks.get(i).isPendingDestroy()) {
+                if (tanks.get(i).body != null && tanks.get(i).body.getWorld() != null) {
+                    myGdxGame.world.destroyBody(tanks.get(i).body);
+                }
+                tanks.remove(i);
+                enemiesKilled++;
+                continue;
+            }
+
             if (tanks.get(i).isEnemy() && !tanks.get(i).isDestroyed() && tanks.get(i) != null) {
                 if (tankObject != null && tankObject.isEnemyFrozen() && tanks.get(i) != null) {
                     tanks.get(i).stop();

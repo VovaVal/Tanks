@@ -41,6 +41,7 @@ public class TankObject extends GameObject {
 
     private float originalSpeed = GameSettings.TANK_SPEED;
     private float originalShootCooldown;
+    private boolean pendingDestroy = false;
 
 
     public TankObject(int x, int y, int width, int height, String texturePath, World world,
@@ -94,6 +95,15 @@ public class TankObject extends GameObject {
             }
         } return false;
     }
+
+    public void markForDestroy() {
+        pendingDestroy = true;
+    }
+
+    public boolean isPendingDestroy() {
+        return pendingDestroy;
+    }
+
 
     private void chasePlayer(TankObject player) {
         int px = player.getX();
