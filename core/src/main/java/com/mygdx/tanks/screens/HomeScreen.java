@@ -28,9 +28,12 @@ public class HomeScreen extends ScreenAdapter {
     BackgroundView homeBackground;
     ImageView tanksText;
     private ScreenViewport uiViewport;
+    // GameScreen gameScreen;
 
     public HomeScreen(Tanks myGdxGame) {
         this.myGdxGame = myGdxGame;
+
+        // gameScreen = new GameScreen(this.myGdxGame);
 
         uiViewport = new ScreenViewport();
         uiViewport.apply(true);
