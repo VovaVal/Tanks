@@ -25,6 +25,12 @@ public class GameResources {
     public static final String HOME_BACKGROUND_IMG_PATH = "textures_imgs/home_background.png";
     public static final String  TANKS_TEXT_IMG_PATH = "textures_imgs/tanks_text.png";
     public static final String  CHAINS_IMG_PATH = "textures_imgs/chains_img.png";
+    public static final String SHIELD_BONUS_IMG_PATH = "textures_imgs/shield_img.png";
+    public static final String SPEED_BONUS_IMG_PATH = "textures_imgs/speed_img.png";
+    public static final String RAPID_FIRE_BONUS_IMG_PATH = "textures_imgs/rapid_fire_img.png";
+    public static final String LIFE_BONUS_IMG_PATH = "textures_imgs/plus_life.png";
+    public static final String FREEZE_BONUS_IMG_PATH = "textures_imgs/freeze.png";
+    public static final String GRENADE_BONUS_IMG_PATH = "textures_imgs/grenade.png";
 
     public static final String FONT_PATH = "fonts/Montserrat-Bold.ttf";
 

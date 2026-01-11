@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.tanks.GameSession;
 import com.mygdx.tanks.GameSettings;
 import com.mygdx.tanks.GameState;
+import com.mygdx.tanks.objects.BonusObject;
 import com.mygdx.tanks.objects.BulletObject;
 import com.mygdx.tanks.objects.GameObject;
 import com.mygdx.tanks.objects.TankObject;
@@ -118,6 +119,35 @@ public class ContactManager {
                 } else if (objA instanceof TankObject && objB instanceof TankObject) {
                     ((TankObject) objA).stop();
                     ((TankObject) objB).stop();
+                } else if ((objA instanceof TankObject && objB instanceof BonusObject) ||
+                    (objA instanceof BonusObject && objB instanceof TankObject)) {
+
+                    TankObject tank;
+                    BonusObject bonus;
+
+                    if (objA instanceof TankObject) {
+                        tank = (TankObject) objA;
+                        bonus = (BonusObject) objB;
+                    } else {
+                        tank = (TankObject) objB;
+                        bonus = (BonusObject) objA;
+                    }
+
+                    if (!tank.isEnemy() && bonus.isActive()) {
+                        BonusObject.BonusType type = bonus.getType();
+
+                        if (type == BonusObject.BonusType.GRENADE) {
+                            gameScreen.activateGrenade();
+                        } else {
+                            tank.applyBonus(type);
+                        }
+
+                        bonus.deactivate();
+
+                        // audioManager.bonusPickup.play();
+
+                        System.out.println("Player took" + type);
+                    }
                 }
             }
 

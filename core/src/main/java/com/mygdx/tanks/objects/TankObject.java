@@ -29,13 +29,26 @@ public class TankObject extends GameObject {
 
     private EnemyState state = EnemyState.PATROL;
 
+    private boolean hasShield = false;
+    private boolean hasSpeedBoost = false;
+    private boolean hasRapidFire = false;
+    private boolean enemiesFrozen = false;
+
+    private long shieldEndTime = 0;
+    private long speedBoostEndTime = 0;
+    private long rapidFireEndTime = 0;
+    private long freezeEndTime = 0;
+
+    private float originalSpeed = GameSettings.TANK_SPEED;
+    private float originalShootCooldown;
+
 
     public TankObject(int x, int y, int width, int height, String texturePath, World world,
                       Boolean enemy, int livesLeft) {
         super(texturePath, x, y, width, height, GameSettings.TANK_BIT, world, "tank");
 
         lastShotTime = TimeUtils.millis() - GameSettings.SHOOTING_COOL_DOWN;
-        // body.setLinearDamping(13);
+
         body.setLinearDamping(20);
         this.enemy = enemy;
         dirMove = new Vector2();
@@ -43,11 +56,15 @@ public class TankObject extends GameObject {
         nextMove = startTime + GameSettings.NEXT_MOVE;
         destroyed = false;
         chooseRandomDirection();
+
         if (enemy){
             coolDown = GameSettings.SHOOTING_COOL_DOWN_ENEMIES;
+            originalShootCooldown = GameSettings.SHOOTING_COOL_DOWN_ENEMIES;
         } else {
             coolDown = GameSettings.SHOOTING_COOL_DOWN;
+            originalShootCooldown = GameSettings.SHOOTING_COOL_DOWN;
         }
+
         this.livesLeft = livesLeft;
     }
 
@@ -147,7 +164,7 @@ public class TankObject extends GameObject {
         if (dir.len() > 0) {
             dir.nor();
             System.out.println("Move!!!");
-            body.setLinearVelocity(dir.x * GameSettings.TANK_SPEED, dir.y * GameSettings.TANK_SPEED);
+            body.setLinearVelocity(dir.x * getCurrentSpeed(), dir.y * getCurrentSpeed());
         } else {
             stop();
         }
@@ -210,7 +227,7 @@ public class TankObject extends GameObject {
     }
 
     public boolean canShoot() {
-        return TimeUtils.millis() - lastShotTime >= coolDown;
+        return TimeUtils.millis() - lastShotTime >= getCurrentCooldown();
     }
 
     public void shoot() {
@@ -236,11 +253,23 @@ public class TankObject extends GameObject {
             texture.getHeight(),
             false, false
         );
+
+//        if (hasRapidFire && (TimeUtils.millis() / 200) % 2 == 0) {
+//            batch.setColor(1f, 0.8f, 0.3f, 0.5f);
+//            batch.setColor(1, 1, 1, 1);
+//        }
+//
+//        if (hasShield) {
+//            batch.setColor(0.3f, 0.5f, 1f, 0.6f);
+//            batch.setColor(1, 1, 1, 1);
+//        }
     }
 
 
     @Override
     public void hit() {
+        if (hasShield) return;
+
         livesLeft -= 1;
     }
 
@@ -250,5 +279,93 @@ public class TankObject extends GameObject {
 
     public int getLiveLeft() {
         return livesLeft;
+    }
+
+    public void applyBonus(BonusObject.BonusType type) {
+        long currentTime = TimeUtils.millis();
+
+        switch (type) {
+            case SHIELD:
+                hasShield = true;
+                shieldEndTime = currentTime + (long)(GameSettings.SHIELD_DURATION * 1000);
+                System.out.println("Shield!");
+                break;
+
+            case SPEED:
+                hasSpeedBoost = true;
+                speedBoostEndTime = currentTime + (long)(GameSettings.SPEED_BOOST_DURATION * 1000);
+                System.out.println("Faster move!");
+                break;
+
+            case RAPID_FIRE:
+                hasRapidFire = true;
+                rapidFireEndTime = currentTime + (long)(GameSettings.RAPID_FIRE_DURATION * 1000);
+                System.out.println("Rapid shoot!");
+                break;
+
+            case LIFE:
+                livesLeft = Math.min(livesLeft + 1, 3);
+                System.out.println("+ 1 life!");
+                break;
+
+            case FREEZE:
+                enemiesFrozen = true;
+                freezeEndTime = currentTime + (long)(GameSettings.FREEZE_DURATION * 1000);
+                System.out.println("Freeze!");
+                break;
+
+            case GRENADE:
+                System.out.println("Grenade!");
+                break;
+        }
+    }
+
+    public void updateBonuses() {
+        long currentTime = TimeUtils.millis();
+
+        if (hasShield && currentTime > shieldEndTime) {
+            hasShield = false;
+        }
+
+        if (hasSpeedBoost && currentTime > speedBoostEndTime) {
+            hasSpeedBoost = false;
+        }
+
+        if (hasRapidFire && currentTime > rapidFireEndTime) {
+            hasRapidFire = false;
+        }
+
+        if (enemiesFrozen && currentTime > freezeEndTime) {
+            enemiesFrozen = false;
+        }
+    }
+
+    public float getCurrentSpeed() {
+        return hasSpeedBoost ?
+            originalSpeed * GameSettings.SPEED_BOOST_MULTIPLIER :
+            originalSpeed;
+    }
+
+    public int getCurrentCooldown() {
+        if (hasRapidFire) {
+            return (int)(originalShootCooldown * GameSettings.RAPID_FIRE_MULTIPLIER);
+        }
+        return (int)originalShootCooldown;
+    }
+
+    public boolean isEnemyFrozen() {
+        return enemiesFrozen;
+    }
+
+    public boolean hasShield() {
+        return hasShield;
+    }
+
+    public boolean hasSpeedBoost() {
+        return hasSpeedBoost;
+    }
+
+    public boolean hasRapidFire() {
+        return hasRapidFire;
     }
 }

@@ -33,6 +33,21 @@ public class GameSettings {
     public static final short BRICK_BIT = 4;
     public static final short STEEL_BIT = 8;
     public static final short EAGLE_BIT = 8;
+    public static final short BONUS_BIT = 1 << 8;
+
+    public static final float BONUS_DURATION = 7f;
+    public static final float BONUS_SPAWN_CHANCE = 0.25f; // 25% шанс при убийстве танка
+    public static final int MAX_BONUSES_ON_MAP = 2;
+
+    public static final float SHIELD_DURATION = 5f;
+    public static final float SPEED_BOOST_DURATION = 8f;
+    public static final float RAPID_FIRE_DURATION = 10f;
+    public static final float FREEZE_DURATION = 6f;
+
+    public static final float SPEED_BOOST_MULTIPLIER = 1.8f;
+    public static final float RAPID_FIRE_MULTIPLIER = 0.4f;
+
+    public static final float BONUS_SPAWN_INTERVAL = 20f;
 
     // Типы/виды тайлов
     public static final int TILE_EMPTY = 0;

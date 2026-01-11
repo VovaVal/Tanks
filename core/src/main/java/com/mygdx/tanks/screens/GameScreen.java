@@ -37,6 +37,7 @@ import com.mygdx.tanks.components.TextView;
 import com.mygdx.tanks.components.VirtualJoystick;
 import com.mygdx.tanks.managers.ContactManager;
 import com.mygdx.tanks.managers.MemoryManager;
+import com.mygdx.tanks.objects.BonusObject;
 import com.mygdx.tanks.objects.BulletObject;
 import com.mygdx.tanks.objects.TankObject;
 import com.mygdx.tanks.objects.WallsObject;
@@ -122,6 +123,8 @@ public class GameScreen extends ScreenAdapter {
     private float ignoreInputTimer = 0f;
     private static final float IGNORE_INPUT_TIME = 0.5f;
     private GameState previousState = GameState.PLAYING;
+    private ArrayList<BonusObject> bonuses;
+    private float bonusSpawnTimer = 0f;
 
 
     public GameScreen(Tanks myGdxGame) {
@@ -211,6 +214,7 @@ public class GameScreen extends ScreenAdapter {
         tanks = new ArrayList<>();
         spawns = new ArrayList<>();
         wallsToDestroy = new ArrayList<>();
+        bonuses = new ArrayList<>();
 
         spawnFrames = new Texture[4];
         spawnFrames[0] = new Texture("textures_imgs/spawn_1.png");
@@ -339,11 +343,110 @@ public class GameScreen extends ScreenAdapter {
         enemiesSpawned++;
     }
 
+//    public void activateGrenade() {
+//        System.out.println("Grenade was activated!");
+//
+//        for (int i = 0; i < tanks.size(); i++) {
+//            TankObject enemy = tanks.get(i);
+//            if (enemy.isEnemy() && !enemy.isDestroyed()) {
+//                playDeath(enemy);
+//
+//                myGdxGame.world.destroyBody(enemy.body);
+//                tanks.remove(i--);
+//                enemiesKilled++;
+//
+//                // myGdxGame.audioManager.death.play();
+//            }
+//        }
+//    }
+
+//    public void activateGrenade() {
+//        System.out.println("Grenade was activated!");
+//
+//        // Используем итератор для безопасного удаления
+//        for (int i = tanks.size() - 1; i >= 0; i--) {
+//            TankObject enemy = tanks.get(i);
+//            if (enemy != null && enemy.isEnemy() && !enemy.isDestroyed()) {
+//                // Создаем эффект смерти
+//                playDeath(enemy);
+//
+//                // Уничтожаем тело танка (с проверкой)
+//                if (enemy.body != null && enemy.body.getWorld() != null) {
+//                    myGdxGame.world.destroyBody(enemy.body);
+//                }
+//
+//                // Увеличиваем счет убитых
+//                enemiesKilled++;
+//
+//                // Удаляем танк из списка
+//                tanks.remove(i);
+//            }
+//        }
+//
+//        // Проверяем, не превысили ли общее количество убитых врагов
+//        enemiesKilled = Math.min(enemiesKilled, TOTAL_ENEMIES);
+//
+//        // Звук взрыва
+//        myGdxGame.audioManager.death.play();
+//    }
+
+    public void activateGrenade() {
+        System.out.println("Grenade was activated!");
+
+        // Запоминаем, сколько врагов было уничтожено
+        int killedByGrenade = 0;
+
+        // Используем итератор для безопасного удаления
+        for (int i = tanks.size() - 1; i >= 0; i--) {
+            TankObject enemy = tanks.get(i);
+            if (enemy != null && enemy.isEnemy() && !enemy.isDestroyed()) {
+                // Создаем эффект смерти
+                playDeath(enemy);
+
+                // Уничтожаем тело танка (с проверкой)
+                if (enemy.body != null && enemy.body.getWorld() != null) {
+                    myGdxGame.world.destroyBody(enemy.body);
+                }
+
+                // Увеличиваем счетчики
+                killedByGrenade++;
+                enemiesKilled++;
+
+                // Удаляем танк из списка
+                tanks.remove(i);
+            }
+        }
+
+        // Уменьшаем счетчик заспавненных врагов на количество убитых гранатой
+        enemiesSpawned -= killedByGrenade;
+
+        // Проверяем, чтобы счетчики не ушли в минус
+        enemiesSpawned = Math.max(0, enemiesSpawned);
+        enemiesKilled = Math.min(enemiesKilled, TOTAL_ENEMIES);
+
+        System.out.println("Граната убила " + killedByGrenade + " врагов. Всего убито: " + enemiesKilled + "/" + TOTAL_ENEMIES);
+
+        // Звук взрыва
+        myGdxGame.audioManager.death.play();
+    }
+
     private void playDeath(TankObject tank) {
         Vector2 coords = new Vector2((int) tank.getX(), (int) tank.getY());
 
         Effect effect = new Effect(deathFrames, coords.cpy(), 0.13f, GameSettings.TANK_PIXEL_SIZE);
         deathEffects.add(effect);
+
+        // if (tank.isEnemy()) spawnBonusOnEnemyDeath((int)coords.x, (int)coords.y);
+        if (tank.isEnemy()) {
+            final int finalX = (int) coords.x;
+            final int finalY = (int) coords.y;
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    spawnBonusOnEnemyDeath(finalX, finalY);
+                }
+            });
+        }
     }
 
     private void updateSpawnEffects(float delta) {
@@ -421,6 +524,12 @@ public class GameScreen extends ScreenAdapter {
 
         handleInput();
 
+        updateBonuses(delta);
+        if (gameSession.state == GameState.PLAYING) {
+            updateBonusTimers(delta);
+            trySpawnRandomBonus();
+        }
+
         updateSpawnEffects(Gdx.graphics.getDeltaTime());
         updateDeathEffects(Gdx.graphics.getDeltaTime());
         updatePlayerRespawn(Gdx.graphics.getDeltaTime());
@@ -452,6 +561,105 @@ public class GameScreen extends ScreenAdapter {
         if (gameSession.state == GameState.PLAYING) myGdxGame.stepWorld();
 
         draw();
+    }
+
+    private void updateBonuses(float delta) {
+        for (int i = 0; i < bonuses.size(); i++) {
+            BonusObject bonus = bonuses.get(i);
+
+            if (bonus.shouldRemove()) {
+                myGdxGame.world.destroyBody(bonus.body);
+                bonuses.remove(i--);
+            }
+        }
+    }
+
+    private void updateBonusTimers(float delta) {
+        if (tankObject != null) {
+            tankObject.updateBonuses();
+        }
+
+        bonusSpawnTimer += delta;
+    }
+
+    private void trySpawnRandomBonus() {
+        if (bonuses.size() >= GameSettings.MAX_BONUSES_ON_MAP) return;
+
+        if (bonusSpawnTimer >= GameSettings.BONUS_SPAWN_INTERVAL) {
+            spawnBonusAtRandomLocation();
+            bonusSpawnTimer = 0f;
+        }
+    }
+
+    private void spawnBonusAtRandomLocation() {
+        int attempts = 0;
+        while (attempts < 30) {
+            int x = random.nextInt((int)GameSettings.MAP_WIDTH - 100) + 50;
+            int y = random.nextInt((int)GameSettings.MAP_HEIGHT - 100) + 50;
+
+            // Проверяем, что место свободно и не слишком близко к игроку
+            if (isPositionFree(x, y) && !isTooCloseToPlayer(x, y)) {
+                BonusObject.BonusType type = getRandomBonusType();
+                BonusObject bonus = new BonusObject(x, y, type, myGdxGame.world);
+                bonuses.add(bonus);
+                System.out.println(getBonusName(type) + " создан");
+                break;
+            }
+            attempts++;
+        }
+    }
+
+    private void spawnBonusOnEnemyDeath(int x, int y) {
+        if (random.nextFloat() < GameSettings.BONUS_SPAWN_CHANCE) {
+            BonusObject.BonusType type = getRandomBonusType();
+            BonusObject bonus = new BonusObject(x, y, type, myGdxGame.world);
+            bonuses.add(bonus);
+            System.out.println(getBonusName(type));
+        }
+    }
+
+    private boolean isPositionFree(float x, float y) {
+        // Проверяем, нет ли на этой позиции стены
+        for (WallsObject wall : walls) {
+            float dx = Math.abs(wall.getX() - x);
+            float dy = Math.abs(wall.getY() - y);
+            if (dx < GameSettings.TILE_SIZE && dy < GameSettings.TILE_SIZE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isTooCloseToPlayer(float x, float y) {
+        if (tankObject == null) return false;
+
+        float dx = Math.abs(tankObject.getX() - x);
+        float dy = Math.abs(tankObject.getY() - y);
+        float minDistance = 200f; // Минимальное расстояние от игрока
+
+        return dx < minDistance && dy < minDistance;
+    }
+
+    private BonusObject.BonusType getRandomBonusType() {
+        float rand = random.nextFloat();
+        if (rand < 0.2f) return BonusObject.BonusType.SHIELD;
+        else if (rand < 0.35f) return BonusObject.BonusType.SPEED;
+        else if (rand < 0.5f) return BonusObject.BonusType.RAPID_FIRE;
+        else if (rand < 0.65f) return BonusObject.BonusType.LIFE;
+        else if (rand < 0.85f) return BonusObject.BonusType.FREEZE;
+        else return BonusObject.BonusType.GRENADE;
+    }
+
+    private String getBonusName(BonusObject.BonusType type) {
+        switch (type) {
+            case SHIELD: return "Щит";
+            case SPEED: return "Ускорение";
+            case RAPID_FIRE: return "Ускоренная стрельба";
+            case LIFE: return "+1 жизнь";
+            case FREEZE: return "Заморозка";
+            case GRENADE: return "Граната";
+            default: return "Неизвестный";
+        }
     }
 
     private void updatePlayerRespawn(float delta) {
@@ -673,8 +881,12 @@ public class GameScreen extends ScreenAdapter {
 
     private void updateEnemyTanks() {
         for (int i = 0; i < tanks.size(); i++) {
-            if (tanks.get(i).isEnemy() && !tanks.get(i).isDestroyed()) {
-                tanks.get(i).enemyMove(tankObject, walls);
+            if (tanks.get(i).isEnemy() && !tanks.get(i).isDestroyed() && tanks.get(i) != null) {
+                if (tankObject != null && tankObject.isEnemyFrozen() && tanks.get(i) != null) {
+                    tanks.get(i).stop();
+                } else if (tanks.get(i) != null) {
+                    tanks.get(i).enemyMove(tankObject, walls);
+                }
 
                 if (!tanks.get(i).isAlive()){
                     myGdxGame.audioManager.death.play();
@@ -685,7 +897,10 @@ public class GameScreen extends ScreenAdapter {
                     continue;
                 }
 
-                if (tanks.get(i).canShoot()){
+                if (tanks.get(i).canShoot()) {
+                    if (tankObject != null && tankObject.isEnemyFrozen()) {
+                        continue;
+                    }
                     tanks.get(i).shoot();
 
                     int x = tanks.get(i).getX();
@@ -771,6 +986,11 @@ public class GameScreen extends ScreenAdapter {
             } else {
                 wall.draw(myGdxGame.batch);
             }
+
+        for (BonusObject bonus : bonuses) {
+            bonus.draw(myGdxGame.batch);
+        }
+
         for (BulletObject bullet : bullets) bullet.draw(myGdxGame.batch);
         myGdxGame.batch.end();
 
@@ -817,7 +1037,7 @@ public class GameScreen extends ScreenAdapter {
         myGdxGame.audioManager.backgroundMusicGame.stop();
         myGdxGame.audioManager.startSound.stop();
 
-        // disposeCurrentState();
+        disposeCurrentState();
         myGdxGame.resetWorld();
 
         gameSession = new GameSession();
@@ -864,6 +1084,14 @@ public class GameScreen extends ScreenAdapter {
         if (spawnEffects != null) spawnEffects.clear();
         if (deathEffects != null) deathEffects.clear();
         if (spawns != null) spawns.clear();
+        if (bonuses != null) {
+            for (BonusObject bonus : bonuses) {
+                if (bonus != null && bonus.body != null) {
+                    bonus.body.setUserData(null);
+                }
+            }
+            bonuses.clear();
+        }
 
         tankObject = null;
         shootPointer = -1;
