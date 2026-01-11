@@ -28,12 +28,12 @@ public class HomeScreen extends ScreenAdapter {
     BackgroundView homeBackground;
     ImageView tanksText;
     private ScreenViewport uiViewport;
-    // GameScreen gameScreen;
+    GameScreen gameScreen;
 
     public HomeScreen(Tanks myGdxGame) {
         this.myGdxGame = myGdxGame;
 
-        // gameScreen = new GameScreen(this.myGdxGame);
+        gameScreen = new GameScreen(this.myGdxGame);
 
         uiViewport = new ScreenViewport();
         uiViewport.apply(true);
@@ -73,7 +73,8 @@ public class HomeScreen extends ScreenAdapter {
 
             if (level1.isHit(touchPos.x, touchPos.y)) {
                 myGdxGame.audioManager.btnClick.play();
-                myGdxGame.setScreen(new GameScreen(myGdxGame));
+                gameScreen.restart();
+                myGdxGame.setScreen(gameScreen);
             }
         }
     }

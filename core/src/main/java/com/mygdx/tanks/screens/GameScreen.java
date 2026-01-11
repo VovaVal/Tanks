@@ -769,8 +769,8 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        myGdxGame.audioManager.startSound.play();
-        myGdxGame.audioManager.backgroundMusicGame.play();
+        // myGdxGame.audioManager.startSound.play();
+        // myGdxGame.audioManager.backgroundMusicGame.play();
     }
 
     public void restart() {
