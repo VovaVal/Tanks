@@ -95,6 +95,10 @@ public class HomeScreen extends ScreenAdapter {
                 myGdxGame.audioManager.btnClick.play();
                 gameScreen.restart("maps/map_6.tmx");
                 myGdxGame.setScreen(gameScreen);
+            } else if (level7.isHit(touchPos.x, touchPos.y)) {
+                myGdxGame.audioManager.btnClick.play();
+                gameScreen.restart("maps/map_7.tmx");
+                myGdxGame.setScreen(gameScreen);
             }
         }
     }
