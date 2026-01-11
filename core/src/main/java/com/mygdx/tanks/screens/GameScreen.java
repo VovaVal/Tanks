@@ -36,6 +36,7 @@ import com.mygdx.tanks.components.LiveView;
 import com.mygdx.tanks.components.TextView;
 import com.mygdx.tanks.components.VirtualJoystick;
 import com.mygdx.tanks.managers.ContactManager;
+import com.mygdx.tanks.managers.MemoryManager;
 import com.mygdx.tanks.objects.BulletObject;
 import com.mygdx.tanks.objects.TankObject;
 import com.mygdx.tanks.objects.WallsObject;
@@ -408,7 +409,20 @@ public class GameScreen extends ScreenAdapter {
 
         if (tankLives == 0) gameSession.state = GameState.ENDED;
         if (drawFlag && timeToDie < TimeUtils.millis()) gameSession.state = GameState.ENDED;
-        if (enemiesKilled == TOTAL_ENEMIES) gameSession.state = GameState.ENDED;
+        if (enemiesKilled == TOTAL_ENEMIES){
+            gameSession.state = GameState.ENDED;
+
+            Character c = mapPath.charAt(mapPath.length() - 5);
+            System.out.println(c);
+
+            if (c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9') {
+                int n = MemoryManager.getMaxLevel();
+
+                if (c == Character.forDigit(n, 10)) {
+                    MemoryManager.setMaxLevel(n + 1);
+                }
+            }
+        }
 
         liveView.setLeftLives(tankLives);
         tanksKilledText.setText(String.valueOf(enemiesKilled) + " ");

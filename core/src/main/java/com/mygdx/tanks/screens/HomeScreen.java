@@ -12,6 +12,7 @@ import com.mygdx.tanks.Tanks;
 import com.mygdx.tanks.components.BackgroundView;
 import com.mygdx.tanks.components.ButtonView;
 import com.mygdx.tanks.components.ImageView;
+import com.mygdx.tanks.managers.MemoryManager;
 
 public class HomeScreen extends ScreenAdapter {
     Tanks myGdxGame;
@@ -98,31 +99,31 @@ public class HomeScreen extends ScreenAdapter {
                 myGdxGame.audioManager.btnClick.play();
                 gameScreen.restart("maps/map_3.tmx");
                 myGdxGame.setScreen(gameScreen);
-            } else if (level4.isHit(touchPos.x, touchPos.y)) {
+            } else if (level4.isHit(touchPos.x, touchPos.y) && 4 <= MemoryManager.getMaxLevel()) {
                 myGdxGame.audioManager.btnClick.play();
                 gameScreen.restart("maps/map_4.tmx");
                 myGdxGame.setScreen(gameScreen);
-            } else if (level5.isHit(touchPos.x, touchPos.y)) {
+            } else if (level5.isHit(touchPos.x, touchPos.y) && 5 <= MemoryManager.getMaxLevel()) {
                 myGdxGame.audioManager.btnClick.play();
                 gameScreen.restart("maps/map_5.tmx");
                 myGdxGame.setScreen(gameScreen);
-            } else if (level6.isHit(touchPos.x, touchPos.y)) {
+            } else if (level6.isHit(touchPos.x, touchPos.y) && 6 <= MemoryManager.getMaxLevel()) {
                 myGdxGame.audioManager.btnClick.play();
                 gameScreen.restart("maps/map_6.tmx");
                 myGdxGame.setScreen(gameScreen);
-            } else if (level7.isHit(touchPos.x, touchPos.y)) {
+            } else if (level7.isHit(touchPos.x, touchPos.y) && 7 <= MemoryManager.getMaxLevel()) {
                 myGdxGame.audioManager.btnClick.play();
                 gameScreen.restart("maps/map_7.tmx");
                 myGdxGame.setScreen(gameScreen);
-            } else if (level8.isHit(touchPos.x, touchPos.y)) {
+            } else if (level8.isHit(touchPos.x, touchPos.y) && 8 <= MemoryManager.getMaxLevel()) {
                 myGdxGame.audioManager.btnClick.play();
                 gameScreen.restart("maps/map_8.tmx");
                 myGdxGame.setScreen(gameScreen);
-            } else if (level9.isHit(touchPos.x, touchPos.y)) {
+            } else if (level9.isHit(touchPos.x, touchPos.y) && 9 <= MemoryManager.getMaxLevel()) {
                 myGdxGame.audioManager.btnClick.play();
                 gameScreen.restart("maps/map_9.tmx");
                 myGdxGame.setScreen(gameScreen);
-            } else if (level10.isHit(touchPos.x, touchPos.y)) {
+            } else if (level10.isHit(touchPos.x, touchPos.y) && 10 <= MemoryManager.getMaxLevel()) {
                 myGdxGame.audioManager.btnClick.play();
                 gameScreen.restart("maps/map_10.tmx");
                 myGdxGame.setScreen(gameScreen);
@@ -155,13 +156,13 @@ public class HomeScreen extends ScreenAdapter {
 
         tanksText.draw(myGdxGame.batch);
 
-        chains4.draw(myGdxGame.batch);
-        chains5.draw(myGdxGame.batch);
-        chains6.draw(myGdxGame.batch);
-        chains7.draw(myGdxGame.batch);
-        chains8.draw(myGdxGame.batch);
-        chains9.draw(myGdxGame.batch);
-        chains10.draw(myGdxGame.batch);
+        if(!(4 <= MemoryManager.getMaxLevel())) chains4.draw(myGdxGame.batch);
+        if(!(5 <= MemoryManager.getMaxLevel())) chains5.draw(myGdxGame.batch);
+        if(!(6 <= MemoryManager.getMaxLevel())) chains6.draw(myGdxGame.batch);
+        if(!(7 <= MemoryManager.getMaxLevel())) chains7.draw(myGdxGame.batch);
+        if(!(8 <= MemoryManager.getMaxLevel())) chains8.draw(myGdxGame.batch);
+        if(!(9 <= MemoryManager.getMaxLevel())) chains9.draw(myGdxGame.batch);
+        if(!(10 <= MemoryManager.getMaxLevel())) chains10.draw(myGdxGame.batch);
 
         myGdxGame.batch.end();
     }
