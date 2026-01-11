@@ -119,6 +119,10 @@ public class GameScreen extends ScreenAdapter {
     public long timeToDie;
     String mapPath;
 
+    private float ignoreInputTimer = 0f;
+    private static final float IGNORE_INPUT_TIME = 0.5f;
+    private GameState previousState = GameState.PLAYING;
+
 
     public GameScreen(Tanks myGdxGame) {
         this.myGdxGame = myGdxGame;
@@ -401,6 +405,20 @@ public class GameScreen extends ScreenAdapter {
     }
 
     public void render(float delta) {
+        if (previousState != gameSession.state) {
+            if (gameSession.state == GameState.ENDED ||
+                gameSession.state == GameState.PAUSED) {
+                shootPointer = -1;
+                joystickPointer = -1;
+                ignoreInputTimer = IGNORE_INPUT_TIME;
+            }
+            previousState = gameSession.state;
+        }
+
+        if (ignoreInputTimer > 0) {
+            ignoreInputTimer -= delta;
+        }
+
         handleInput();
 
         updateSpawnEffects(Gdx.graphics.getDeltaTime());
@@ -508,6 +526,8 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void handleInput() {
+        if (ignoreInputTimer > 0) return;
+
         for (int i = 0; i < Gdx.input.getMaxPointers(); i++) {
             if (Gdx.input.isTouched(i)) {
                 Vector3 touchPos = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
