@@ -49,6 +49,8 @@ public class TankObject extends GameObject {
     }
 
     private boolean canSeePlayer(TankObject player) {
+        if (player == null) return false;
+
         float dx = Math.abs(player.getX() - getX());
         float dy = Math.abs(player.getY() - getY());
 
@@ -126,7 +128,9 @@ public class TankObject extends GameObject {
     public void enemyMove(TankObject player) {
         long currentTime = TimeUtils.millis();
 
-        if (canSeePlayer(player)) {
+        if (player == null || player.isDestroyed()) {
+            state = EnemyState.PATROL;
+        } else if (canSeePlayer(player)) {
             state = EnemyState.CHASE;
         } else {
             state = EnemyState.PATROL;
