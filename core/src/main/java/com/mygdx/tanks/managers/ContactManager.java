@@ -64,10 +64,10 @@ public class ContactManager {
                         audioManager.hitSteelSound.play();
                     } else if (wall.getType() == GameSettings.TILE_EAGLE) {
                         System.out.println("Eagle");
-                        if (bullet.isEnemyBullet()) {
+                        if (bullet.isEnemyBullet() && !gameScreen.drawFlag) {
                             gameSession.state = GameState.ENDED;
                             audioManager.tankDiedMain.play();
-                        } else {
+                        } else if (!gameScreen.drawFlag) {
                             System.out.println("Put a flag!");
                             audioManager.tankDiedMain.play();
                             gameScreen.drawFlag = true;

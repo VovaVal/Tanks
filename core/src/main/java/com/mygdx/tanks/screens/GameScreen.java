@@ -120,10 +120,11 @@ public class GameScreen extends ScreenAdapter {
 
     public GameScreen(Tanks myGdxGame) {
         this.myGdxGame = myGdxGame;
-        contactManager = new ContactManager(myGdxGame.world, this, myGdxGame.audioManager, gameSession);
 
         gameSession = new GameSession();
         gameSession.startGame();
+
+        contactManager = new ContactManager(myGdxGame.world, this, myGdxGame.audioManager, gameSession);
 
         backgroundView = new BackgroundView(GameResources.BACKGROUND_GAME_IMG_PATH);
 
@@ -778,6 +779,9 @@ public class GameScreen extends ScreenAdapter {
         myGdxGame.audioManager.backgroundMusicGame.stop();
 
         disposeCurrentState();
+        myGdxGame.resetWorld();
+        gameSession = new GameSession();
+        contactManager = new ContactManager(myGdxGame.world, this, myGdxGame.audioManager, gameSession);
         initializeGame();
 
         gameSession.startGame();
@@ -785,23 +789,75 @@ public class GameScreen extends ScreenAdapter {
         myGdxGame.audioManager.backgroundMusicGame.play();
     }
 
+//    private void disposeCurrentState() {
+//        destroyAllBodies();
+//
+//        if (bullets != null) bullets.clear();
+//        if (tanks != null) tanks.clear();
+//        if (walls != null) walls.clear();
+//        if (spawnEffects != null) spawnEffects.clear();
+//        if (deathEffects != null) deathEffects.clear();
+//        if (spawns != null) spawns.clear();
+//
+//        tankObject = null;
+//        shootPointer = -1;
+//        joystickPointer = -1;
+//
+//        drawFlag = false;
+//        timeToDie = 0;
+//
+//        playerDead = false;
+//        playerSpawning = false;
+//        enemiesKilled = 0;
+//        enemiesSpawned = 0;
+//        tankLives = 3;
+//    }
+
     private void disposeCurrentState() {
+        // Уничтожаем все тела
         destroyAllBodies();
 
-        if (bullets != null) bullets.clear();
-        if (tanks != null) tanks.clear();
-        if (walls != null) walls.clear();
+        // Очищаем списки
+        if (bullets != null) {
+            for (BulletObject bullet : bullets) {
+                if (bullet != null) {
+                    bullet.dispose(); // Добавьте метод dispose в BulletObject
+                }
+            }
+            bullets.clear();
+        }
+
+        if (tanks != null) {
+            for (TankObject tank : tanks) {
+                if (tank != null) {
+                    tank.dispose(); // Добавьте метод dispose в TankObject
+                }
+            }
+            tanks.clear();
+        }
+
+        if (walls != null) {
+            for (WallsObject wall : walls) {
+                if (wall != null) {
+                    wall.dispose(); // Добавьте метод dispose в WallsObject
+                }
+            }
+            walls.clear();
+        }
+
         if (spawnEffects != null) spawnEffects.clear();
         if (deathEffects != null) deathEffects.clear();
         if (spawns != null) spawns.clear();
+        if (wallsToDestroy != null) wallsToDestroy.clear();
 
+        // Обнуляем объекты
         tankObject = null;
         shootPointer = -1;
         joystickPointer = -1;
 
+        // Сбрасываем флаги
         drawFlag = false;
         timeToDie = 0;
-
         playerDead = false;
         playerSpawning = false;
         enemiesKilled = 0;

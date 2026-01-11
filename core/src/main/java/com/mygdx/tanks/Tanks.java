@@ -51,10 +51,10 @@ public class Tanks extends Game {
         commonWhiteFont = FontBuilder.generate(24, Color.WHITE, GameResources.FONT_PATH);
         commonBlackFont = FontBuilder.generate(24, Color.BLACK, GameResources.FONT_PATH);
 
-        gameScreen = new GameScreen(this);
+        // gameScreen = new GameScreen(this);
         homeScreen = new HomeScreen(this);
 
-        setScreen(gameScreen);
+        setScreen(homeScreen);
     }
 
     public void stepWorld() {
@@ -80,6 +80,8 @@ public class Tanks extends Game {
         }
 
         world = new World(new Vector2(0, 0), true);
+
+        System.out.println("New world created. Body count: " + world.getBodyCount());
     }
 
     @Override

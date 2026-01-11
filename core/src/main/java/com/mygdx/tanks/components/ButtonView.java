@@ -39,9 +39,6 @@ public class ButtonView extends View {
         float textWidth = glyphLayout.width;
         float textHeight = glyphLayout.height;
 
-//        textX = x + (width - textWidth) / 2;
-//        textY = y + (height + textHeight) / 2;
-
         textX = x + (width - textWidth) / 2;
         textY = y + (height + textHeight + 30) / 2;
     }
