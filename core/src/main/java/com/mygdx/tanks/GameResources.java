@@ -22,6 +22,7 @@ public class GameResources {
     public static final String BLACKOUT_FULL_IMG_PATH = "textures_imgs/blackout_full.png";
     public static final String BUTTON_IMG_PATH = "textures_imgs/button_img.png";
     public static final String FLAG_IMG_PATH = "textures_imgs/flag_img.png";
+    public static final String HOME_BACKGROUND_IMG_PATH = "textures_imgs/home_background.png";
 
     public static final String FONT_PATH = "fonts/Montserrat-Bold.ttf";
 

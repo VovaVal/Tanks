@@ -591,6 +591,11 @@ public class GameScreen extends ScreenAdapter {
                             for (TankObject tank: tanks) {
                                 tank.lastShotTime = TimeUtils.millis();
                             }
+                        } else if (homeButton.isHit(touchPos.x, touchPos.y)) {
+                            gameSession.state = GameState.ENDED;
+                            myGdxGame.audioManager.backgroundMusicGame.stop();
+                            myGdxGame.audioManager.btnClick.play();
+                            myGdxGame.setScreen(myGdxGame.homeScreen);
                         }
                         break;
 
@@ -601,6 +606,11 @@ public class GameScreen extends ScreenAdapter {
                             myGdxGame.audioManager.btnClick.play();
                             restart();
                             return;
+                        } else if (homeButton2.isHit(touchPos.x, touchPos.y)) {
+                            gameSession.state = GameState.ENDED;
+                            myGdxGame.audioManager.backgroundMusicGame.stop();
+                            myGdxGame.audioManager.btnClick.play();
+                            myGdxGame.setScreen(myGdxGame.homeScreen);
                         }
                         break;
                 }
