@@ -27,6 +27,13 @@ public class HomeScreen extends ScreenAdapter {
     ButtonView level10;
     BackgroundView homeBackground;
     ImageView tanksText;
+    ImageView chains5;
+    ImageView chains4;
+    ImageView chains6;
+    ImageView chains7;
+    ImageView chains8;
+    ImageView chains9;
+    ImageView chains10;
     private ScreenViewport uiViewport;
     GameScreen gameScreen;
 
@@ -52,6 +59,14 @@ public class HomeScreen extends ScreenAdapter {
         level10 = new ButtonView(1720, 50, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 10");
 
         tanksText = new ImageView(800, 600, GameResources.TANKS_TEXT_IMG_PATH, 700, 600);
+
+        chains4 = new ImageView(1330, 380, GameResources.CHAINS_IMG_PATH, 400, 155);
+        chains5 = new ImageView(1770, 380, GameResources.CHAINS_IMG_PATH, 400, 155);
+        chains6 = new ImageView(40, 130, GameResources.CHAINS_IMG_PATH, 400, 155);
+        chains7 = new ImageView(480, 130, GameResources.CHAINS_IMG_PATH, 400, 155);
+        chains8 = new ImageView(910, 130, GameResources.CHAINS_IMG_PATH, 400, 155);
+        chains9 = new ImageView(1340, 130, GameResources.CHAINS_IMG_PATH, 400, 155);
+        chains10 = new ImageView(1775, 130, GameResources.CHAINS_IMG_PATH, 400, 155);
     }
 
     @Override
@@ -139,6 +154,14 @@ public class HomeScreen extends ScreenAdapter {
         level10.draw(myGdxGame.batch);
 
         tanksText.draw(myGdxGame.batch);
+
+        chains4.draw(myGdxGame.batch);
+        chains5.draw(myGdxGame.batch);
+        chains6.draw(myGdxGame.batch);
+        chains7.draw(myGdxGame.batch);
+        chains8.draw(myGdxGame.batch);
+        chains9.draw(myGdxGame.batch);
+        chains10.draw(myGdxGame.batch);
 
         myGdxGame.batch.end();
     }
