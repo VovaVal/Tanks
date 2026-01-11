@@ -6,8 +6,8 @@ public class GameSettings {
 
     // Сетка уровня (в пикселях)
     public static final int TILE_SIZE = 64;
-    public static final int MAP_WIDTH = 1472;
-    public static final int MAP_HEIGHT = 1472;
+    public static final int MAP_WIDTH = 1408;
+    public static final int MAP_HEIGHT = 1408;
 
     public static final float SCALE = 0.01f;
 
