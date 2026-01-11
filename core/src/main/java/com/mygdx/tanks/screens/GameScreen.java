@@ -640,7 +640,7 @@ public class GameScreen extends ScreenAdapter {
     private void updateEnemyTanks() {
         for (int i = 0; i < tanks.size(); i++) {
             if (tanks.get(i).isEnemy() && !tanks.get(i).isDestroyed()) {
-                tanks.get(i).enemyMove(tankObject);
+                tanks.get(i).enemyMove(tankObject, walls);
 
                 if (!tanks.get(i).isAlive()){
                     myGdxGame.audioManager.death.play();
@@ -781,6 +781,7 @@ public class GameScreen extends ScreenAdapter {
         mapPath = path;
 
         myGdxGame.audioManager.backgroundMusicGame.stop();
+        myGdxGame.audioManager.startSound.stop();
 
         // disposeCurrentState();
         myGdxGame.resetWorld();

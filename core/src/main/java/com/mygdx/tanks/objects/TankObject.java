@@ -8,6 +8,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.tanks.GameSettings;
 
+import java.util.ArrayList;
+
 public class TankObject extends GameObject {
     public long lastShotTime;
     private int livesLeft = 3;
@@ -21,7 +23,8 @@ public class TankObject extends GameObject {
 
     enum EnemyState {
         PATROL,
-        CHASE
+        CHASE,
+        BASE
     }
 
     private EnemyState state = EnemyState.PATROL;
@@ -60,6 +63,21 @@ public class TankObject extends GameObject {
         return dx < GameSettings.AXIS_EPSILON || dy < GameSettings.AXIS_EPSILON;
     }
 
+    private boolean canSeeEagle(ArrayList<WallsObject> walls) {
+        for (WallsObject wall: walls) {
+            if (wall != null && wall.getType() == GameSettings.TILE_EAGLE) {
+
+                float dx = Math.abs(wall.getX() - getX());
+                float dy = Math.abs(wall.getY() - getY());
+
+                float distance = (float)Math.sqrt(dx * dx + dy * dy);
+                if (distance > GameSettings.VISION_RADIUS) return false;
+
+                return dx < GameSettings.AXIS_EPSILON || dy < GameSettings.AXIS_EPSILON;
+            }
+        } return false;
+    }
+
     private void chasePlayer(TankObject player) {
         int px = player.getX();
         int py = player.getY();
@@ -82,6 +100,35 @@ public class TankObject extends GameObject {
             dirMove.x * GameSettings.ENEMY_TANK_SPEED,
             dirMove.y * GameSettings.ENEMY_TANK_SPEED
         );
+    }
+
+    private void chaseBase(ArrayList<WallsObject> walls) {
+        for (WallsObject wall: walls) {
+            if (wall != null && wall.getType() == GameSettings.TILE_EAGLE) {
+
+                int px = wall.getX();
+                int py = wall.getY();
+
+                int x = getX();
+                int y = getY();
+
+                if (Math.abs(px - x) < GameSettings.AXIS_EPSILON) {
+                    // Двигаемся по Y
+                    dirMove.set(0, Math.signum(py - y));
+                    angleDeg = (py > y) ? 0 : 180;
+                }
+                else if (Math.abs(py - y) < GameSettings.AXIS_EPSILON) {
+                    // Двигаемся по X
+                    dirMove.set(Math.signum(px - x), 0);
+                    angleDeg = (px > x) ? 270 : 90;
+                }
+
+                body.setLinearVelocity(
+                    dirMove.x * GameSettings.ENEMY_TANK_SPEED,
+                    dirMove.y * GameSettings.ENEMY_TANK_SPEED
+                );
+            }
+        }
     }
 
     private void chooseRandomDirection() {
@@ -125,20 +172,26 @@ public class TankObject extends GameObject {
         this.destroyed = destroyed;
     }
 
-    public void enemyMove(TankObject player) {
+    public void enemyMove(TankObject player, ArrayList<WallsObject> walls) {
         long currentTime = TimeUtils.millis();
 
-        if (player == null || player.isDestroyed()) {
-            state = EnemyState.PATROL;
-        } else if (canSeePlayer(player)) {
-            state = EnemyState.CHASE;
+        if (canSeeEagle(walls)) {
+            state = EnemyState.BASE;
         } else {
-            state = EnemyState.PATROL;
+            if (player == null || player.isDestroyed()) {
+                state = EnemyState.PATROL;
+            } else if (canSeePlayer(player)) {
+                state = EnemyState.CHASE;
+            } else {
+                state = EnemyState.PATROL;
+            }
         }
 
         if (state == EnemyState.CHASE) {
             chasePlayer(player);
             return;
+        } else if (state == EnemyState.BASE) {
+            chaseBase(walls);
         }
 
         if (currentTime > nextMove) {
