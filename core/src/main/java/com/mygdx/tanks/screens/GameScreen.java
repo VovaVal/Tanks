@@ -86,6 +86,7 @@ public class GameScreen extends ScreenAdapter {
     private int enemiesSpawned = 0;
     private int enemiesKilled = 0;
     Texture spawnMarkerTexture;
+    Texture flag;
 
     Texture[] spawnFrames;
     ArrayList<Effect> spawnEffects;
@@ -113,11 +114,13 @@ public class GameScreen extends ScreenAdapter {
     ButtonView continueButton2;
 
     Boolean restarting;
+    public Boolean drawFlag = false;
+    public long timeToDie;
 
 
     public GameScreen(Tanks myGdxGame) {
         this.myGdxGame = myGdxGame;
-        contactManager = new ContactManager(myGdxGame.world, this, myGdxGame.audioManager);
+        contactManager = new ContactManager(myGdxGame.world, this, myGdxGame.audioManager, gameSession);
 
         gameSession = new GameSession();
         gameSession.startGame();
@@ -133,6 +136,7 @@ public class GameScreen extends ScreenAdapter {
         random = new Random();
 
         spawnMarkerTexture = new Texture(GameResources.SPAWN_IMG_PATH);
+        flag = new Texture(GameResources.FLAG_IMG_PATH);
 
         gameCamera = new OrthographicCamera();
         gameCamera.setToOrtho(false, mapWidth, mapHeight);
@@ -401,6 +405,7 @@ public class GameScreen extends ScreenAdapter {
         updatePlayerRespawn(Gdx.graphics.getDeltaTime());
 
         if (tankLives == 0) gameSession.state = GameState.ENDED;
+        if (drawFlag && timeToDie < TimeUtils.millis()) gameSession.state = GameState.ENDED;
 
         liveView.setLeftLives(tankLives);
         tanksKilledText.setText(String.valueOf(enemiesKilled) + " ");
@@ -593,15 +598,8 @@ public class GameScreen extends ScreenAdapter {
                         System.out.println("End");
 
                         if (continueButton2.isHit(touchPos.x, touchPos.y)) {
-
-//                            dispose();
                             myGdxGame.audioManager.btnClick.play();
                             restart();
-//                            myGdxGame.resetWorld();
-//                            isRestarting = true;
-//                            Gdx.app.postRunnable(() -> {
-//                                myGdxGame.setScreen(new GameScreen(myGdxGame));
-//                            });
                             return;
                         }
                         break;
@@ -714,7 +712,18 @@ public class GameScreen extends ScreenAdapter {
 
         if (tankObject != null && !tankObject.isDestroyed()) tankObject.draw(myGdxGame.batch);
         for (TankObject tank : tanks) tank.draw(myGdxGame.batch);
-        for (WallsObject wall : walls) wall.draw(myGdxGame.batch);
+        for (WallsObject wall : walls)
+            if (wall.getType() == GameSettings.TILE_EAGLE) {
+                if (drawFlag) {
+                    float x = wall.getX() - flag.getWidth() / 2f - 10;
+                    float y = wall.getY() - flag.getHeight() / 2f - 10;
+                    myGdxGame.batch.draw(flag, x, y, 64, 64);
+                } else {
+                    wall.draw(myGdxGame.batch);
+                }
+            } else {
+                wall.draw(myGdxGame.batch);
+            }
         for (BulletObject bullet : bullets) bullet.draw(myGdxGame.batch);
         myGdxGame.batch.end();
 
@@ -779,6 +788,9 @@ public class GameScreen extends ScreenAdapter {
         tankObject = null;
         shootPointer = -1;
         joystickPointer = -1;
+
+        drawFlag = false;
+        timeToDie = 0;
 
         playerDead = false;
         playerSpawning = false;

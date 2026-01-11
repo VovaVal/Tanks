@@ -6,7 +6,10 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.tanks.GameSession;
 import com.mygdx.tanks.GameSettings;
+import com.mygdx.tanks.GameState;
 import com.mygdx.tanks.objects.BulletObject;
 import com.mygdx.tanks.objects.GameObject;
 import com.mygdx.tanks.objects.TankObject;
@@ -16,13 +19,14 @@ import com.mygdx.tanks.screens.GameScreen;
 public class ContactManager {
     World world;
     GameScreen gameScreen;
-
     AudioManager audioManager;
+    GameSession gameSession;
 
-    public ContactManager(World world, GameScreen gameScreen, AudioManager audioManager) {
+    public ContactManager(World world, GameScreen gameScreen, AudioManager audioManager, GameSession gameSession) {
         this.world = world;
         this.gameScreen = gameScreen;
         this.audioManager = audioManager;
+        this.gameSession = gameSession;
 
         world.setContactListener(new ContactListener() {
             @Override
@@ -60,6 +64,15 @@ public class ContactManager {
                         audioManager.hitSteelSound.play();
                     } else if (wall.getType() == GameSettings.TILE_EAGLE) {
                         System.out.println("Eagle");
+                        if (bullet.isEnemyBullet()) {
+                            gameSession.state = GameState.ENDED;
+                            audioManager.tankDiedMain.play();
+                        } else {
+                            System.out.println("Put a flag!");
+                            audioManager.tankDiedMain.play();
+                            gameScreen.drawFlag = true;
+                            gameScreen.timeToDie = TimeUtils.millis() + 2000;
+                        }
                     }
                 } else if (objA instanceof BulletObject && objB instanceof BulletObject) {
                     BulletObject bullet1;
