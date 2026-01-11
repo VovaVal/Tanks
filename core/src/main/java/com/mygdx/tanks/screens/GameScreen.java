@@ -407,6 +407,7 @@ public class GameScreen extends ScreenAdapter {
 
         if (tankLives == 0) gameSession.state = GameState.ENDED;
         if (drawFlag && timeToDie < TimeUtils.millis()) gameSession.state = GameState.ENDED;
+        if (enemiesKilled == TOTAL_ENEMIES) gameSession.state = GameState.ENDED;
 
         liveView.setLeftLives(tankLives);
         tanksKilledText.setText(String.valueOf(enemiesKilled) + " ");
