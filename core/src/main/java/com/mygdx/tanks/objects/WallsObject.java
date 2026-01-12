@@ -2,12 +2,9 @@ package com.mygdx.tanks.objects;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.GameSettings;
-
-import java.util.Random;
 
 public class WallsObject extends GameObject {
     private final int tileType;

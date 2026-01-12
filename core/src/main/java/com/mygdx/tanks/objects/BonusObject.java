@@ -11,12 +11,12 @@ import com.mygdx.tanks.GameResources;
 public class BonusObject extends GameObject {
 
     public enum BonusType {
-        SHIELD,        // Щит - непробиваемая броня
-        SPEED,         // Ускорение движения
-        RAPID_FIRE,    // Ускорение стрельбы
-        LIFE,          // +1 жизнь
-        FREEZE,        // Заморозка врагов
-        GRENADE        // Уничтожение всех врагов
+        SHIELD,
+        SPEED,
+        RAPID_FIRE,
+        LIFE,
+        FREEZE,
+        GRENADE
     }
 
     private BonusType type;

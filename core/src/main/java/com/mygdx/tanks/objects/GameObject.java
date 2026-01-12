@@ -64,7 +64,7 @@ public class GameObject {
         if (kind.equals("tank") || kind.equals("bullet")) {
             bodyDef.type = BodyDef.BodyType.DynamicBody;
         } else {
-            bodyDef.type = BodyDef.BodyType.StaticBody; // brick, steel, eagle
+            bodyDef.type = BodyDef.BodyType.StaticBody;
         }
 
         bodyDef.fixedRotation = true;

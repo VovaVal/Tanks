@@ -144,7 +144,7 @@ public class ContactManager {
 
                         bonus.deactivate();
 
-                        // audioManager.bonusPickup.play();
+                        audioManager.bonusPickup.play();
 
                         System.out.println("Player took" + type);
                     }

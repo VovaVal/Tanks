@@ -51,7 +51,6 @@ public class Tanks extends Game {
         commonWhiteFont = FontBuilder.generate(24, Color.WHITE, GameResources.FONT_PATH);
         commonBlackFont = FontBuilder.generate(24, Color.BLACK, GameResources.FONT_PATH);
 
-        // gameScreen = new GameScreen(this);
         homeScreen = new HomeScreen(this);
 
         setScreen(homeScreen);

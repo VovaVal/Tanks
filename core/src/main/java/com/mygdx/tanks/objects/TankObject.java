@@ -305,12 +305,6 @@ public class TankObject extends GameObject {
             texture.getHeight(),
             false, false
         );
-
-//        if (hasRapidFire && (TimeUtils.millis() / 200) % 2 == 0) {
-//            batch.setColor(1f, 0.8f, 0.3f, 0.5f);
-//            batch.setColor(1, 1, 1, 1);
-//        }
-//
     }
 
 

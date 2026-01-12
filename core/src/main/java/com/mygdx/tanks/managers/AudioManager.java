@@ -14,6 +14,7 @@ public class AudioManager {
     public Sound hitSteelSound;
     public Sound tankDiedMain;
     public Sound btnClick;
+    public Sound bonusPickup;
 
     public AudioManager() {
         backgroundMusicGame = Gdx.audio.newMusic(Gdx.files.internal(GameResources.PLAY_SOUND_PATH));
@@ -23,6 +24,7 @@ public class AudioManager {
         hitSteelSound = Gdx.audio.newSound(Gdx.files.internal(GameResources.HIT_STEEL_SOUND_PATH));
         tankDiedMain = Gdx.audio.newSound(Gdx.files.internal(GameResources.TANK_DIED_SOUND_PATH));
         btnClick = Gdx.audio.newSound(Gdx.files.internal(GameResources.BTN_CLICK_SOUND_PATH));
+        bonusPickup = Gdx.audio.newSound(Gdx.files.internal(GameResources.BONUS_PICKUP_SOUND_PATH));
 
         backgroundMusicGame.setVolume(0.2f);
         backgroundMusicGame.setLooping(true);

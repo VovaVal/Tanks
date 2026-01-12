@@ -1,7 +1,6 @@
 package com.mygdx.tanks;
 
 public class GameResources {
-    // Изображения
 
     public static final String BACKGROUND_GAME_IMG_PATH = "textures_imgs/background_game.png";
     public static final String LIVE_IMG_PATH = "textures_imgs/life.png";
@@ -42,4 +41,5 @@ public class GameResources {
     public static final String HIT_STEEL_SOUND_PATH = "sounds/hit_steel_sound.mp3";
     public static final String TANK_DIED_SOUND_PATH = "sounds/tank_died_sound.mp3";
     public static final String BTN_CLICK_SOUND_PATH = "sounds/btn_click.mp3";
+    public static final String BONUS_PICKUP_SOUND_PATH = "sounds/bonus_pickup_sound.mp3";
 }

@@ -18,7 +18,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -241,7 +240,6 @@ public class GameScreen extends ScreenAdapter {
         }
 
         playerSpawning = true;
-        // playerDead = true;
         Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
         effect.isPlayerSpawn = true;
         spawnEffects.add(effect);
@@ -251,10 +249,7 @@ public class GameScreen extends ScreenAdapter {
 
         liveView.setLeftLives(3);
 
-//        playerDead = false;
         playerSpawning = false;
-
-        // gameSession.startGame();
     }
 
     private void addMap() {
@@ -343,84 +338,6 @@ public class GameScreen extends ScreenAdapter {
         enemiesSpawned++;
     }
 
-//    public void activateGrenade() {
-//        System.out.println("Grenade was activated!");
-//
-//        for (int i = 0; i < tanks.size(); i++) {
-//            TankObject enemy = tanks.get(i);
-//            if (enemy.isEnemy() && !enemy.isDestroyed()) {
-//                playDeath(enemy);
-//
-//                myGdxGame.world.destroyBody(enemy.body);
-//                tanks.remove(i--);
-//                enemiesKilled++;
-//
-//                // myGdxGame.audioManager.death.play();
-//            }
-//        }
-//    }
-
-//    public void activateGrenade() {
-//        System.out.println("Grenade was activated!");
-//
-//        // Используем итератор для безопасного удаления
-//        for (int i = tanks.size() - 1; i >= 0; i--) {
-//            TankObject enemy = tanks.get(i);
-//            if (enemy != null && enemy.isEnemy() && !enemy.isDestroyed()) {
-//                // Создаем эффект смерти
-//                playDeath(enemy);
-//
-//                // Уничтожаем тело танка (с проверкой)
-//                if (enemy.body != null && enemy.body.getWorld() != null) {
-//                    myGdxGame.world.destroyBody(enemy.body);
-//                }
-//
-//                // Увеличиваем счет убитых
-//                enemiesKilled++;
-//
-//                // Удаляем танк из списка
-//                tanks.remove(i);
-//            }
-//        }
-//
-//        // Проверяем, не превысили ли общее количество убитых врагов
-//        enemiesKilled = Math.min(enemiesKilled, TOTAL_ENEMIES);
-//
-//        // Звук взрыва
-//        myGdxGame.audioManager.death.play();
-//    }
-
-//    public void activateGrenade() {
-//        System.out.println("Grenade was activated!");
-//
-//        int killedByGrenade = 0;
-//
-//        for (int i = tanks.size() - 1; i >= 0; i--) {
-//            TankObject enemy = tanks.get(i);
-//            if (enemy != null && enemy.isEnemy() && !enemy.isDestroyed()) {
-//                playDeath(enemy);
-//
-//                if (enemy.body != null && enemy.body.getWorld() != null) {
-//                    myGdxGame.world.destroyBody(enemy.body);
-//                }
-//
-//                killedByGrenade++;
-//                enemiesKilled++;
-//
-//                tanks.remove(i);
-//            }
-//        }
-//
-//        enemiesSpawned -= killedByGrenade;
-//
-//        enemiesSpawned = Math.max(0, enemiesSpawned);
-//        enemiesKilled = Math.min(enemiesKilled, TOTAL_ENEMIES);
-//
-//        System.out.println("Граната убила " + killedByGrenade + " врагов. Всего убито: " + enemiesKilled + "/" + TOTAL_ENEMIES);
-//
-//        myGdxGame.audioManager.death.play();
-//    }
-
     public void activateGrenade() {
         System.out.println("Grenade was activated!");
 
@@ -447,7 +364,6 @@ public class GameScreen extends ScreenAdapter {
         Effect effect = new Effect(deathFrames, coords.cpy(), 0.13f, GameSettings.TANK_PIXEL_SIZE);
         deathEffects.add(effect);
 
-        // if (tank.isEnemy()) spawnBonusOnEnemyDeath((int)coords.x, (int)coords.y);
         if (tank.isEnemy()) {
             final int finalX = (int) coords.x;
             final int finalY = (int) coords.y;
@@ -613,7 +529,7 @@ public class GameScreen extends ScreenAdapter {
                 BonusObject.BonusType type = getRandomBonusType();
                 BonusObject bonus = new BonusObject(x, y, type, myGdxGame.world);
                 bonuses.add(bonus);
-                System.out.println(getBonusName(type) + " создан");
+                System.out.println(getBonusName(type) + " created");
                 break;
             }
             attempts++;
@@ -1044,10 +960,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     @Override
-    public void show() {
-        // myGdxGame.audioManager.startSound.play();
-        // myGdxGame.audioManager.backgroundMusicGame.play();
-    }
+    public void show() {}
 
     public void restart(String path) {
         System.out.println("Restarting game...");

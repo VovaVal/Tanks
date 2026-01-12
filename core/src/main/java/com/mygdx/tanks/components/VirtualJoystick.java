@@ -46,7 +46,6 @@ public class VirtualJoystick {
     }
 
     public void update() {
-        // если джойстик не активен, ищем палец, который коснулся круга
         if (activePointer == -1) {
             for (int i = 0; i < 5; i++) {
                 if (!Gdx.input.isTouched(i)) continue;
