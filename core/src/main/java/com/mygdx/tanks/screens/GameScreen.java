@@ -357,9 +357,6 @@ public class GameScreen extends ScreenAdapter {
             }
         }
 
-        enemiesSpawned -= killedByGrenade;
-        enemiesSpawned = Math.max(0, enemiesSpawned);
-
         myGdxGame.audioManager.death.play();
     }
 
@@ -472,7 +469,7 @@ public class GameScreen extends ScreenAdapter {
             playerWin = false;
         }
         if (drawFlag && timeToDie < TimeUtils.millis()) gameSession.state = GameState.ENDED;
-        if (enemiesKilled == TOTAL_ENEMIES){
+        if (enemiesKilled >= TOTAL_ENEMIES){
             gameSession.state = GameState.ENDED;
             playerWin = true;
 
