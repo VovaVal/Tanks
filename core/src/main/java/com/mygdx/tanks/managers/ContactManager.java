@@ -74,6 +74,8 @@ public class ContactManager {
                             gameScreen.drawFlag = true;
                             gameScreen.timeToDie = TimeUtils.millis() + 2000;
                         }
+
+                        gameScreen.playerWin = false;
                     }
                 } else if (objA instanceof BulletObject && objB instanceof BulletObject) {
                     BulletObject bullet1;

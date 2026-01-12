@@ -108,6 +108,7 @@ public class GameScreen extends ScreenAdapter {
 
     ImageView fullBlackoutView;
     TextView pauseTextView;
+    TextView loseWinTextView;
     ButtonView continueButton;
     ButtonView homeButton;
 
@@ -124,6 +125,7 @@ public class GameScreen extends ScreenAdapter {
     private GameState previousState = GameState.PLAYING;
     private ArrayList<BonusObject> bonuses;
     private float bonusSpawnTimer = 0f;
+    public boolean playerWin;
 
 
     public GameScreen(Tanks myGdxGame) {
@@ -136,7 +138,7 @@ public class GameScreen extends ScreenAdapter {
 
         backgroundView = new BackgroundView(GameResources.BACKGROUND_GAME_IMG_PATH);
 
-        map = new TmxMapLoader().load("maps/map_1.tmx");  // карта
+        map = new TmxMapLoader().load("maps/map_1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map);
 
         float mapWidth = GameSettings.MAP_WIDTH;
@@ -185,6 +187,10 @@ public class GameScreen extends ScreenAdapter {
             1100,
             800,
             "Pause"
+        );
+        loseWinTextView = new TextView(
+            myGdxGame.largeWhiteFont,
+            1080, 900, ""
         );
         continueButton = new ButtonView(550, 450,
             600, 300,
@@ -461,10 +467,14 @@ public class GameScreen extends ScreenAdapter {
         updateDeathEffects(Gdx.graphics.getDeltaTime());
         updatePlayerRespawn(Gdx.graphics.getDeltaTime());
 
-        if (tankLives == 0) gameSession.state = GameState.ENDED;
+        if (tankLives == 0) {
+            gameSession.state = GameState.ENDED;
+            playerWin = false;
+        }
         if (drawFlag && timeToDie < TimeUtils.millis()) gameSession.state = GameState.ENDED;
         if (enemiesKilled == TOTAL_ENEMIES){
             gameSession.state = GameState.ENDED;
+            playerWin = true;
 
             Character c = mapPath.charAt(mapPath.length() - 5);
             System.out.println(c);
@@ -954,6 +964,12 @@ public class GameScreen extends ScreenAdapter {
             fullBlackoutView.draw(myGdxGame.batch);
             homeButton2.draw(myGdxGame.batch);
             continueButton2.draw(myGdxGame.batch);
+            if (playerWin){
+                loseWinTextView.setText("YOU WON!");
+            } else {
+                loseWinTextView.setText("YOU LOST :(");
+            }
+            loseWinTextView.draw(myGdxGame.batch);
         }
 
         myGdxGame.batch.end();
