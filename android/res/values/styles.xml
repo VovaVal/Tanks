@@ -1,5 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="GdxTheme" parent="android:Theme.Material.Light.NoActionBar.Fullscreen">
-        <item name="android:colorBackground">@color/background</item>
+    <style name="GdxTheme" parent="android:Theme">
+        <item name="android:windowBackground">@drawable/splash_bg</item>
+        <item name="android:colorBackground">@drawable/splash_bg</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@null</item>
+
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+
+    <style name="GdxTheme.Launcher" parent="GdxTheme">
+        <item name="android:windowBackground">@drawable/splash_bg</item>
     </style>
 </resources>
