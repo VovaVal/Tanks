@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.tanks.managers.AudioManager;
 import com.mygdx.tanks.screens.GameScreen;
 import com.mygdx.tanks.screens.HomeScreen;
+import com.mygdx.tanks.screens.StartScreen;
 
 import static com.mygdx.tanks.GameSettings.*;
 
@@ -29,6 +30,7 @@ public class Tanks extends Game {
 
     public GameScreen gameScreen;
     public HomeScreen homeScreen;
+    public StartScreen startScreen;
 
     public AudioManager audioManager;
 
@@ -52,8 +54,9 @@ public class Tanks extends Game {
         commonBlackFont = FontBuilder.generate(24, Color.BLACK, GameResources.FONT_PATH);
 
         homeScreen = new HomeScreen(this);
+        startScreen = new StartScreen(this);
 
-        setScreen(homeScreen);
+        setScreen(startScreen);
     }
 
     public void stepWorld() {

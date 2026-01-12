@@ -31,6 +31,7 @@ public class GameResources {
     public static final String FREEZE_BONUS_IMG_PATH = "textures_imgs/freeze.png";
     public static final String GRENADE_BONUS_IMG_PATH = "textures_imgs/grenade.png";
     public static final String SHIELD_IMG_PATH = "textures_imgs/shield_img_game.png";
+    public static final String START_BACKGROUND_IMG_PATH = "textures_imgs/tank_screen_img.png";
 
     public static final String FONT_PATH = "fonts/Montserrat-Bold.ttf";
 
