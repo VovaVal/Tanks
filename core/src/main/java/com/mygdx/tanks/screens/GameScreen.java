@@ -775,6 +775,7 @@ public class GameScreen extends ScreenAdapter {
                         } else if (homeButton.isHit(touchPos.x, touchPos.y)) {
                             gameSession.state = GameState.ENDED;
                             myGdxGame.audioManager.backgroundMusicGame.stop();
+                            myGdxGame.audioManager.startSound.stop();
                             myGdxGame.audioManager.btnClick.play();
                             myGdxGame.setScreen(myGdxGame.homeScreen);
                         }
