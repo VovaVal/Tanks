@@ -25,7 +25,7 @@ public class StartScreen extends ScreenAdapter {
         uiViewport = new ScreenViewport();
         uiViewport.apply(true);
 
-        startBackground = new BackgroundView(GameResources.START_BACKGROUND_IMG_PATH, 2500, 1100);
+        startBackground = new BackgroundView(GameResources.START_BACKGROUND_IMG_PATH, 2340, 1080);
         startTime = TimeUtils.millis();
     }
 
