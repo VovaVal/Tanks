@@ -43,4 +43,5 @@ public class GameResources {
     public static final String TANK_DIED_SOUND_PATH = "sounds/tank_died_sound.mp3";
     public static final String BTN_CLICK_SOUND_PATH = "sounds/btn_click.mp3";
     public static final String BONUS_PICKUP_SOUND_PATH = "sounds/bonus_pickup_sound.mp3";
+    public static final String START_SCREEN_SOUND_PATH = "sounds/start_sound_screen.mp3";
 }

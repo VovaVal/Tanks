@@ -27,6 +27,8 @@ public class StartScreen extends ScreenAdapter {
 
         startBackground = new BackgroundView(GameResources.START_BACKGROUND_IMG_PATH, 2340, 1080);
         startTime = TimeUtils.millis();
+
+        myGdxGame.audioManager.startScreenSound.play();
     }
 
     @Override
