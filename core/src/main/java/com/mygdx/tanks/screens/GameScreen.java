@@ -398,6 +398,8 @@ public class GameScreen extends ScreenAdapter {
                         1
                     );
 
+                    tankObject.angleDeg = 0;
+
                     playerDead = false;
                     playerSpawning = false;
                 } else {
