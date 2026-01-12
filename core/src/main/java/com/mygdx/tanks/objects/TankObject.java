@@ -1,11 +1,14 @@
 package com.mygdx.tanks.objects;
 
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.GameSettings;
 
 import java.util.ArrayList;
@@ -43,6 +46,9 @@ public class TankObject extends GameObject {
     private float originalShootCooldown;
     private boolean pendingDestroy = false;
 
+    Texture shieldGameImg;
+
+    float shieldPulseTime = 0;
 
     public TankObject(int x, int y, int width, int height, String texturePath, World world,
                       Boolean enemy, int livesLeft) {
@@ -67,6 +73,8 @@ public class TankObject extends GameObject {
         }
 
         this.livesLeft = livesLeft;
+
+        shieldGameImg = new Texture(GameResources.SHIELD_IMG_PATH);
     }
 
     private boolean canSeePlayer(TankObject player) {
@@ -248,6 +256,40 @@ public class TankObject extends GameObject {
     public void draw(SpriteBatch batch) {
         System.out.println(angleDeg);
 
+        if (hasShield) {
+            shieldPulseTime += Gdx.graphics.getDeltaTime();
+        }
+
+        if (hasShield) {
+            float pulse = 1.0f + 0.08f * (float)Math.sin(shieldPulseTime * 4f);
+
+            float alpha = 0.6f + 0.15f * (float)Math.sin(shieldPulseTime * 2f);
+
+            batch.setColor(0.4f, 0.6f, 1f, alpha);
+
+            float shieldScale = 1.35f * pulse;
+            float shieldWidth = width * shieldScale;
+            float shieldHeight = height * shieldScale;
+
+            batch.draw(
+                shieldGameImg,
+                getX() - shieldWidth / 2f,
+                getY() - shieldHeight / 2f,
+                shieldWidth / 2f,
+                shieldHeight / 2f,
+                shieldWidth,
+                shieldHeight,
+                1f, 1f,
+                angleDeg,
+                0, 0,
+                shieldGameImg.getWidth(),
+                shieldGameImg.getHeight(),
+                false, false
+            );
+
+            batch.setColor(1, 1, 1, 1);
+        }
+
         batch.draw(
             texture,
             getX() - width / 2f,
@@ -269,10 +311,6 @@ public class TankObject extends GameObject {
 //            batch.setColor(1, 1, 1, 1);
 //        }
 //
-//        if (hasShield) {
-//            batch.setColor(0.3f, 0.5f, 1f, 0.6f);
-//            batch.setColor(1, 1, 1, 1);
-//        }
     }
 
 
