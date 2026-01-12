@@ -16,6 +16,7 @@ public class AudioManager {
     public Sound btnClick;
     public Sound bonusPickup;
     public Sound startScreenSound;
+    public Music menuMusicSound;
 
     public AudioManager() {
         backgroundMusicGame = Gdx.audio.newMusic(Gdx.files.internal(GameResources.PLAY_SOUND_PATH));
@@ -27,8 +28,12 @@ public class AudioManager {
         btnClick = Gdx.audio.newSound(Gdx.files.internal(GameResources.BTN_CLICK_SOUND_PATH));
         bonusPickup = Gdx.audio.newSound(Gdx.files.internal(GameResources.BONUS_PICKUP_SOUND_PATH));
         startScreenSound = Gdx.audio.newSound(Gdx.files.internal(GameResources.START_SCREEN_SOUND_PATH));
+        menuMusicSound = Gdx.audio.newMusic(Gdx.files.internal(GameResources.MENU_MUSIC_SOUND_PATH));
 
         backgroundMusicGame.setVolume(0.2f);
         backgroundMusicGame.setLooping(true);
+
+        menuMusicSound.setVolume(0.2f);
+        menuMusicSound.setLooping(true);
     }
 }

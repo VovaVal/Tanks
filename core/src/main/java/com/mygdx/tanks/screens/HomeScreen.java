@@ -168,6 +168,16 @@ public class HomeScreen extends ScreenAdapter {
     }
 
     @Override
+    public void show() {
+        myGdxGame.audioManager.menuMusicSound.play();
+    }
+
+    @Override
+    public void hide() {
+        myGdxGame.audioManager.menuMusicSound.stop();
+    }
+
+    @Override
     public void dispose() {
         if (homeBackground != null) homeBackground.dispose();
 
