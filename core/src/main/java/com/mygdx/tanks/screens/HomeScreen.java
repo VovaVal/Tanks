@@ -90,7 +90,7 @@ public class HomeScreen extends ScreenAdapter {
         final float marginY = vh * 0.045f;
         final float gapX = vw * 0.008f;
         final float rowGap = vh * 0.026f;
-        final float titleGap = vh * 0.022f;
+        final float titleGap = vh * 0.001f;
 
         float availW = vw - 2f * marginX;
         float buttonW = (availW - gapX * (cols - 1)) / cols;
@@ -98,13 +98,13 @@ public class HomeScreen extends ScreenAdapter {
         buttonH = Math.max(buttonH, vh * 0.145f);
 
         float gridW = cols * buttonW + (cols - 1) * gapX;
-        float gridH = 2f * buttonH + rowGap;
+        float gridH = 1.7f * buttonH + rowGap;
 
         final float titleAspect = 700f / 600f;
-        float titleW = Math.min(vw * 0.5f, gridW * 1.05f);
+        float titleW = Math.min(vw * 0.64f, gridW * 1.14f);
         float titleH = titleW / titleAspect;
-        if (titleH > vh * 0.32f) {
-            titleH = vh * 0.32f;
+        if (titleH > vh * 0.5f) {
+            titleH = vh * 0.5f;
             titleW = titleH * titleAspect;
         }
 
@@ -133,7 +133,8 @@ public class HomeScreen extends ScreenAdapter {
             int level = 4 + i;
             ButtonView btn = level <= 5 ? topRow[level - 1] : bottomRow[level - 6];
             float cx = btn.x + btn.width * 0.5f - chainW * 0.5f;
-            float cy = btn.y + btn.height - chainH * 0.9f;
+            // Ниже по кнопке (раньше цепь «висела» слишком высоко над центром)
+            float cy = btn.y + btn.height * 0.62f - chainH * 0.55f;
             chains[i].setBounds(cx, cy, chainW, chainH);
         }
     }
