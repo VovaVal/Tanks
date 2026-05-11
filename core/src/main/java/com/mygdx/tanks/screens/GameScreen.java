@@ -2,7 +2,6 @@ package com.mygdx.tanks.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -18,7 +17,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -60,11 +58,12 @@ public class GameScreen extends ScreenAdapter {
 
     private OrthographicCamera gameCamera; // для мира
     private OrthographicCamera uiCamera;   // для UI
-    /** Полноэкранная подложка под картой (пиксели экрана), когда FitViewport оставляет поля по бокам. */
-    private OrthographicCamera screenFillCamera;
     private int backBufferW = 1;
     private int backBufferH = 1;
-    /** Карта без искажения пропорций; вся сетка видна, поля закрываются drawCover. */
+    /** Карта без искажения пропорций; поля вне мира — светло-серые (см. draw). */
+    private static final float LETTERBOX_R = 0.88f;
+    private static final float LETTERBOX_G = 0.88f;
+    private static final float LETTERBOX_B = 0.90f;
     private FitViewport worldViewport;
     private StretchViewport uiViewport;
 
@@ -161,8 +160,6 @@ public class GameScreen extends ScreenAdapter {
 
         worldViewport = new FitViewport(mapWidth, mapHeight, gameCamera);
         worldViewport.apply(true);
-
-        screenFillCamera = new OrthographicCamera();
 
         uiCamera = new OrthographicCamera();
         uiViewport = new StretchViewport(GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT, uiCamera);
@@ -960,19 +957,8 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void draw() {
-        ScreenUtils.clear(Color.CLEAR);
-        Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // Подложка на весь физический экран (под областью FitViewport — без чёрных полос по бокам)
         Gdx.gl.glViewport(0, 0, backBufferW, backBufferH);
-        screenFillCamera.setToOrtho(false, backBufferW, backBufferH);
-        screenFillCamera.position.set(backBufferW * 0.5f, backBufferH * 0.5f, 0);
-        screenFillCamera.update();
-        myGdxGame.batch.setProjectionMatrix(screenFillCamera.combined);
-        myGdxGame.batch.begin();
-        backgroundView.drawCover(myGdxGame.batch, backBufferW, backBufferH);
-        myGdxGame.batch.end();
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // МИР: карта ровно по сетке, без растягивания по осям
         worldViewport.apply(true);
