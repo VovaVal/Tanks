@@ -182,16 +182,30 @@ public class GameScreen extends ScreenAdapter {
             GameResources.CONTROLLER_IMG_PATH
         );
 
+        final float shootBtnW = 300f;
+        final float shootBtnH = 300f;
+        final float shootMarginRight = 40f;
         shootButton = new ButtonView(
-            1900, 200,
-            300, 300,
+            GameSettings.UI_VIEWPORT_WIDTH - shootBtnW - shootMarginRight,
+            200f,
+            shootBtnW,
+            shootBtnH,
             GameResources.SHOOT_BTN_IMG_PATH
         );
 
         tanksKilledText = new TextView(myGdxGame.largeWhiteFont, 1800, 1000, "0");
         tanksAllText = new TextView(myGdxGame.largeWhiteFont, 1830, 1000, " / " + Integer.toString(TOTAL_ENEMIES));
         enemyTankImg = new ImageView(1730, 990, GameResources.ENEMY_TANK_IMG_PATH, 50, 50);
-        pauseBtnImg = new ImageView(0, 870, GameResources.PAUSE_BTN_IMG_PATH, 280, 220);
+        final float pauseW = 280f;
+        final float pauseH = 220f;
+        final float pauseMarginTop = 20f;
+        pauseBtnImg = new ImageView(
+            0f,
+            GameSettings.UI_VIEWPORT_HEIGHT - pauseH - pauseMarginTop,
+            GameResources.PAUSE_BTN_IMG_PATH,
+            (int) pauseW,
+            (int) pauseH
+        );
 
         fullBlackoutView = new ImageView(0, 0, GameResources.BLACKOUT_FULL_IMG_PATH,
             GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT);
