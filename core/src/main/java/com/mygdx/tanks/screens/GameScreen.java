@@ -174,14 +174,14 @@ public class GameScreen extends ScreenAdapter {
 
         joystick = new VirtualJoystick(
             uiViewport,
-            300, 330,
-            200, 130,
+            320, 340,
+            280, 182,
             GameResources.BACKGROUND_CONTROLLER_IMG_PATH,
             GameResources.CONTROLLER_IMG_PATH
         );
 
-        final float shootBtnW = 300f;
-        final float shootBtnH = 300f;
+        final float shootBtnW = 400f;
+        final float shootBtnH = 400f;
         final float shootMarginRight = 40f;
         shootButton = new ButtonView(
             GameSettings.UI_VIEWPORT_WIDTH - shootBtnW - shootMarginRight,
