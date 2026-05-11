@@ -193,9 +193,9 @@ public class GameScreen extends ScreenAdapter {
             GameResources.SHOOT_BTN_IMG_PATH
         );
 
-        tanksKilledText = new TextView(myGdxGame.largeWhiteFont, 1800, 1000, "0");
-        tanksAllText = new TextView(myGdxGame.largeWhiteFont, 1830, 1000, " / " + Integer.toString(TOTAL_ENEMIES));
-        enemyTankImg = new ImageView(1730, 990, GameResources.ENEMY_TANK_IMG_PATH, 50, 50);
+        tanksKilledText = new TextView(myGdxGame.largeWhiteFont, 0, 0, "0");
+        tanksAllText = new TextView(myGdxGame.largeWhiteFont, 0, 0, " / " + Integer.toString(TOTAL_ENEMIES));
+        enemyTankImg = new ImageView(0, 0, GameResources.ENEMY_TANK_IMG_PATH, 50, 50);
         final float pauseW = 280f;
         final float pauseH = 220f;
         final float pauseMarginTop = 20f;
@@ -267,7 +267,7 @@ public class GameScreen extends ScreenAdapter {
         addMap();
         createWorldBounds();
 
-        liveView = new LiveView(2000, 1000);
+        liveView = new LiveView(0, 0);
 
         for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
             spawnEnemyIfPossible();
@@ -282,6 +282,8 @@ public class GameScreen extends ScreenAdapter {
         enemiesKilled = 0;
 
         liveView.setLeftLives(3);
+
+        layoutTopRightHud();
 
         playerSpawning = false;
     }
@@ -926,6 +928,37 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
+    /** Сердца и счётчик врагов — правый верхний угол виртуального HUD с отступом от краёв. */
+    private void layoutTopRightHud() {
+        if (liveView == null || tanksKilledText == null || tanksAllText == null || enemyTankImg == null) {
+            return;
+        }
+        final float vw = GameSettings.UI_VIEWPORT_WIDTH;
+        final float vh = GameSettings.UI_VIEWPORT_HEIGHT;
+        final float pad = 40f;
+
+        float heartsW = liveView.getHeartsClusterWidth();
+        float heartH = liveView.getHeight();
+        float liveX = vw - pad - heartsW;
+        float liveY = vh - pad - heartH;
+        liveView.setBounds(liveX, liveY, liveView.getWidth(), heartH);
+
+        final float iconS = 50f;
+        final float miniGap = 10f;
+        final float blockGap = 24f;
+        float twK = tanksKilledText.getWidth();
+        float twA = tanksAllText.getWidth();
+        float txH = Math.max(tanksKilledText.getHeight(), tanksAllText.getHeight());
+        float rowW = iconS + miniGap + twK + twA;
+        float iconX = liveX - blockGap - rowW;
+
+        enemyTankImg.setBounds(iconX, liveY, iconS, iconS);
+
+        float textY = liveY + (iconS - txH) * 0.5f;
+        tanksKilledText.setBounds(iconX + iconS + miniGap, textY, twK, txH);
+        tanksAllText.setBounds(iconX + iconS + miniGap + twK, textY, twA, txH);
+    }
+
     private void draw() {
         ScreenUtils.clear(Color.CLEAR);
         Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1f);
@@ -985,6 +1018,7 @@ public class GameScreen extends ScreenAdapter {
         uiCamera.update();
 
         myGdxGame.batch.setProjectionMatrix(uiCamera.combined);
+        layoutTopRightHud();
         myGdxGame.batch.begin();
 
         joystick.draw(myGdxGame.batch);

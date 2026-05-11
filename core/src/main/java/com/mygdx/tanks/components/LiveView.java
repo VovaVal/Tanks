@@ -24,6 +24,11 @@ public class LiveView extends View {
         this.leftLives = leftLives;
     }
 
+    /** Ширина трёх сердец в ряд с промежутками (как при отрисовке 3 жизней). */
+    public float getHeartsClusterWidth() {
+        return 3f * width + 2f * (float) livePadding;
+    }
+
     @Override
     public void draw(SpriteBatch batch) {
         if (leftLives > 0) batch.draw(texture, x + (texture.getWidth() * 2 + livePadding), y, width, height);
