@@ -209,10 +209,7 @@ public class GameScreen extends ScreenAdapter {
             GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT);
 
         pauseTextView = new TextView(myGdxGame.largeWhiteFont, 0, 0, "Pause");
-        loseWinTextView = new TextView(
-            myGdxGame.largeWhiteFont,
-            1080, 900, ""
-        );
+        loseWinTextView = new TextView(myGdxGame.largeWhiteFont, 0, 0, "");
         continueButton = new ButtonView(0, 0, 10, 10,
             myGdxGame.largeWhiteFont,
             GameResources.BUTTON_IMG_PATH,
@@ -222,13 +219,11 @@ public class GameScreen extends ScreenAdapter {
             GameResources.BUTTON_IMG_PATH,
             "Home");
 
-        homeButton2 = new ButtonView(1285, 450,
-            600, 300,
+        homeButton2 = new ButtonView(0, 0, 10, 10,
             myGdxGame.largeWhiteFont,
             GameResources.BUTTON_IMG_PATH,
             "Home");
-        continueButton2 = new ButtonView(350, 450,
-            1000, 300,
+        continueButton2 = new ButtonView(0, 0, 10, 10,
             myGdxGame.largeWhiteFont,
             GameResources.BUTTON_IMG_PATH,
             "Play again");
@@ -984,6 +979,48 @@ public class GameScreen extends ScreenAdapter {
         font.getData().setScale(sx, sy);
     }
 
+    /** Экран победы/поражения: крупные кнопки и надпись по центру (масштаб шрифта ×2). */
+    private void layoutEndedOverlay() {
+        if (loseWinTextView == null || continueButton2 == null || homeButton2 == null) {
+            return;
+        }
+        BitmapFont font = myGdxGame.largeWhiteFont;
+        float sx = font.getData().scaleX;
+        float sy = font.getData().scaleY;
+        font.getData().setScale(2f);
+        loseWinTextView.setText(playerWin ? "YOU WON!" : "YOU LOST :(");
+
+        final float vw = GameSettings.UI_VIEWPORT_WIDTH;
+        final float vh = GameSettings.UI_VIEWPORT_HEIGHT;
+        final float textGap = 56f;
+        final float btnGap = 48f;
+
+        float tw = loseWinTextView.getWidth();
+        float th = loseWinTextView.getHeight();
+
+        final float cw0 = 2000f;
+        final float hw0 = 1200f;
+        final float btnH0 = 600f;
+        float rowW0 = cw0 + btnGap + hw0;
+        float maxW = vw - 72f;
+        float s = Math.min(1f, maxW / rowW0);
+        float cw = cw0 * s;
+        float hw = hw0 * s;
+        float btnH = btnH0 * s;
+
+        float groupH = th + textGap + btnH;
+        float groupBottom = (vh - groupH) * 0.5f;
+        float rowY = groupBottom;
+        float rowW = cw + btnGap + hw;
+        float startX = (vw - rowW) * 0.5f;
+
+        continueButton2.setLayoutBounds(startX, rowY, cw, btnH);
+        homeButton2.setLayoutBounds(startX + cw + btnGap, rowY, hw, btnH);
+        loseWinTextView.setBounds((vw - tw) * 0.5f, rowY + btnH + textGap, tw, th);
+
+        font.getData().setScale(sx, sy);
+    }
+
     private void draw() {
         Gdx.gl.glViewport(0, 0, backBufferW, backBufferH);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -1034,6 +1071,8 @@ public class GameScreen extends ScreenAdapter {
         myGdxGame.batch.setProjectionMatrix(uiCamera.combined);
         if (gameSession.state == GameState.PAUSED) {
             layoutPauseOverlay();
+        } else if (gameSession.state == GameState.ENDED && !isRestarting) {
+            layoutEndedOverlay();
         }
         layoutTopRightHud();
         myGdxGame.batch.begin();
@@ -1058,14 +1097,14 @@ public class GameScreen extends ScreenAdapter {
             f.getData().setScale(osx, osy);
         } else if (gameSession.state == GameState.ENDED && !isRestarting) {
             fullBlackoutView.draw(myGdxGame.batch);
-            homeButton2.draw(myGdxGame.batch);
-            continueButton2.draw(myGdxGame.batch);
-            if (playerWin){
-                loseWinTextView.setText("YOU WON!");
-            } else {
-                loseWinTextView.setText("YOU LOST :(");
-            }
+            BitmapFont f = myGdxGame.largeWhiteFont;
+            float osx = f.getData().scaleX;
+            float osy = f.getData().scaleY;
+            f.getData().setScale(2f);
             loseWinTextView.draw(myGdxGame.batch);
+            continueButton2.draw(myGdxGame.batch);
+            homeButton2.draw(myGdxGame.batch);
+            f.getData().setScale(osx, osy);
         }
 
         myGdxGame.batch.end();
