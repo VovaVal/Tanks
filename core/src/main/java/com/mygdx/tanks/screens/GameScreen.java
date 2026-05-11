@@ -5,6 +5,7 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -207,23 +208,16 @@ public class GameScreen extends ScreenAdapter {
         fullBlackoutView = new ImageView(0, 0, GameResources.BLACKOUT_FULL_IMG_PATH,
             GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT);
 
-        pauseTextView = new TextView(
-            myGdxGame.largeWhiteFont,
-            1100,
-            800,
-            "Pause"
-        );
+        pauseTextView = new TextView(myGdxGame.largeWhiteFont, 0, 0, "Pause");
         loseWinTextView = new TextView(
             myGdxGame.largeWhiteFont,
             1080, 900, ""
         );
-        continueButton = new ButtonView(550, 450,
-            600, 300,
+        continueButton = new ButtonView(0, 0, 10, 10,
             myGdxGame.largeWhiteFont,
             GameResources.BUTTON_IMG_PATH,
             "Continue");
-        homeButton = new ButtonView(1185, 450,
-            600, 300,
+        homeButton = new ButtonView(0, 0, 10, 10,
             myGdxGame.largeWhiteFont,
             GameResources.BUTTON_IMG_PATH,
             "Home");
@@ -956,6 +950,40 @@ public class GameScreen extends ScreenAdapter {
         tanksAllText.setBounds(iconX + iconS + miniGap + twK, textY, twA, txH);
     }
 
+    /** Центр экрана: надпись Pause и кнопки в 2× размере (только экран паузы). */
+    private void layoutPauseOverlay() {
+        if (pauseTextView == null || continueButton == null || homeButton == null) {
+            return;
+        }
+        BitmapFont font = myGdxGame.largeWhiteFont;
+        float sx = font.getData().scaleX;
+        float sy = font.getData().scaleY;
+        font.getData().setScale(2f);
+        pauseTextView.setText("Pause");
+
+        final float vw = GameSettings.UI_VIEWPORT_WIDTH;
+        final float vh = GameSettings.UI_VIEWPORT_HEIGHT;
+        final float btnW = 1100f;
+        final float btnH = 450f;
+        final float btnGap = 48f;
+        final float textGap = 48f;
+
+        float tw = pauseTextView.getWidth();
+        float th = pauseTextView.getHeight();
+        float groupH = th + textGap + btnH;
+        float groupBottom = (vh - groupH) * 0.5f;
+        float btnY = groupBottom;
+
+        float totalBtnsW = btnW + btnGap + btnW;
+        float startX = (vw - totalBtnsW) * 0.5f;
+
+        continueButton.setLayoutBounds(startX, btnY, btnW, btnH);
+        homeButton.setLayoutBounds(startX + btnW + btnGap, btnY, btnW, btnH);
+        pauseTextView.setBounds((vw - tw) * 0.5f, btnY + btnH + textGap, tw, th);
+
+        font.getData().setScale(sx, sy);
+    }
+
     private void draw() {
         Gdx.gl.glViewport(0, 0, backBufferW, backBufferH);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -1004,6 +1032,9 @@ public class GameScreen extends ScreenAdapter {
         uiCamera.update();
 
         myGdxGame.batch.setProjectionMatrix(uiCamera.combined);
+        if (gameSession.state == GameState.PAUSED) {
+            layoutPauseOverlay();
+        }
         layoutTopRightHud();
         myGdxGame.batch.begin();
 
@@ -1017,9 +1048,14 @@ public class GameScreen extends ScreenAdapter {
 
         if (gameSession.state == GameState.PAUSED) {
             fullBlackoutView.draw(myGdxGame.batch);
+            BitmapFont f = myGdxGame.largeWhiteFont;
+            float osx = f.getData().scaleX;
+            float osy = f.getData().scaleY;
+            f.getData().setScale(2f);
             pauseTextView.draw(myGdxGame.batch);
             continueButton.draw(myGdxGame.batch);
             homeButton.draw(myGdxGame.batch);
+            f.getData().setScale(osx, osy);
         } else if (gameSession.state == GameState.ENDED && !isRestarting) {
             fullBlackoutView.draw(myGdxGame.batch);
             homeButton2.draw(myGdxGame.batch);
