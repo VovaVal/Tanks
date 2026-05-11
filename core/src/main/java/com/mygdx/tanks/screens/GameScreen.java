@@ -21,7 +21,6 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.GameSession;
 import com.mygdx.tanks.GameSettings;
@@ -61,7 +60,7 @@ public class GameScreen extends ScreenAdapter {
     private OrthographicCamera gameCamera; // для мира
     private OrthographicCamera uiCamera;   // для UI
     private FitViewport worldViewport;
-    private ScreenViewport uiViewport;
+    private FitViewport uiViewport;
 
     public int tankLives = 3;
 
@@ -158,7 +157,7 @@ public class GameScreen extends ScreenAdapter {
         worldViewport.apply(true);
 
         uiCamera = new OrthographicCamera();
-        uiViewport = new ScreenViewport(uiCamera);
+        uiViewport = new FitViewport(GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT, uiCamera);
         uiViewport.apply(true);
 
         joystick = new VirtualJoystick(
@@ -180,7 +179,8 @@ public class GameScreen extends ScreenAdapter {
         enemyTankImg = new ImageView(1730, 990, GameResources.ENEMY_TANK_IMG_PATH, 50, 50);
         pauseBtnImg = new ImageView(0, 870, GameResources.PAUSE_BTN_IMG_PATH, 280, 220);
 
-        fullBlackoutView = new ImageView(0, 0, GameResources.BLACKOUT_FULL_IMG_PATH, 3000, 1100);
+        fullBlackoutView = new ImageView(0, 0, GameResources.BLACKOUT_FULL_IMG_PATH,
+            GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT);
 
         pauseTextView = new TextView(
             myGdxGame.largeWhiteFont,

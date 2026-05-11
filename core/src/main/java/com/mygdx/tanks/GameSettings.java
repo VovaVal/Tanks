@@ -1,8 +1,16 @@
 package com.mygdx.tanks;
 
 public class GameSettings {
-    public static final int SCREEN_WIDTH = 1280;
-    public static final int SCREEN_HEIGHT = 720;
+    /**
+     * Единое виртуальное разрешение для меню и HUD: всё рисуется в этих координатах,
+     * затем FitViewport масштабирует под любой физический экран без обрезания.
+     */
+    public static final int UI_VIEWPORT_WIDTH = 3000;
+    public static final int UI_VIEWPORT_HEIGHT = 1200;
+
+    /** Совместимость: базовый «логический» экран для камеры и редких компонентов */
+    public static final int SCREEN_WIDTH = UI_VIEWPORT_WIDTH;
+    public static final int SCREEN_HEIGHT = UI_VIEWPORT_HEIGHT;
 
     // Сетка уровня (в пикселях)
     public static final int TILE_SIZE = 64;

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class VirtualJoystick {
     private Vector2 center;  // центр джойстика (фиксирован)
@@ -20,18 +20,18 @@ public class VirtualJoystick {
     private boolean isPressed = false;
     private int activePointer = -1;
 
-    private ScreenViewport viewport;
+    private Viewport viewport;
 
     private Vector2 targetPoint;
 
     private static final float SMOOTH_SPEED = 10f;
     private static final float DEAD_ZONE = 0.15f;
 
-    public VirtualJoystick(ScreenViewport screenViewport,
+    public VirtualJoystick(Viewport viewport,
                            float x, float y, float outerRadius, float innerRadius,
                            String outerTexturePath, String innerTexturePath) {
 
-        this.viewport = screenViewport;
+        this.viewport = viewport;
 
         this.center = new Vector2(x, y);
         this.touchPoint = new Vector2(x, y);

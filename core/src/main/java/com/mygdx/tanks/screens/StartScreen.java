@@ -6,14 +6,15 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.tanks.GameResources;
+import com.mygdx.tanks.GameSettings;
 import com.mygdx.tanks.Tanks;
 import com.mygdx.tanks.components.BackgroundView;
 
 public class StartScreen extends ScreenAdapter {
     Tanks myGdxGame;
-    private ScreenViewport uiViewport;
+    private FitViewport uiViewport;
     BackgroundView startBackground;
 
     private long startTime;
@@ -22,7 +23,7 @@ public class StartScreen extends ScreenAdapter {
     public StartScreen(Tanks myGdxGame) {
         this.myGdxGame = myGdxGame;
 
-        uiViewport = new ScreenViewport();
+        uiViewport = new FitViewport(GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT);
         uiViewport.apply(true);
 
         startBackground = new BackgroundView(GameResources.START_BACKGROUND_IMG_PATH, 2340, 1080);

@@ -6,8 +6,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.tanks.GameResources;
+import com.mygdx.tanks.GameSettings;
 import com.mygdx.tanks.Tanks;
 import com.mygdx.tanks.components.BackgroundView;
 import com.mygdx.tanks.components.ButtonView;
@@ -35,7 +36,7 @@ public class HomeScreen extends ScreenAdapter {
     ImageView chains8;
     ImageView chains9;
     ImageView chains10;
-    private ScreenViewport uiViewport;
+    private FitViewport uiViewport;
     GameScreen gameScreen;
 
     public HomeScreen(Tanks myGdxGame) {
@@ -43,7 +44,7 @@ public class HomeScreen extends ScreenAdapter {
 
         gameScreen = new GameScreen(this.myGdxGame);
 
-        uiViewport = new ScreenViewport();
+        uiViewport = new FitViewport(GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT);
         uiViewport.apply(true);
 
         homeBackground = new BackgroundView(GameResources.HOME_BACKGROUND_IMG_PATH, 2500, 1100);
