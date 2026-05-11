@@ -111,7 +111,9 @@ public class HomeScreen extends ScreenAdapter {
         float contentH = titleH + titleGap + gridH;
         float rowBottomY = Math.max(marginY, (vh - contentH) * 0.5f);
         float rowTopY = rowBottomY + buttonH + rowGap;
-        float titleY = rowTopY + buttonH + titleGap;
+        // Опускаем логотип ближе к верхнему ряду кнопок (не меняем contentH — лёгкое перекрытие по вертикали)
+        final float logoDownShift = vh * 0.055f;
+        float titleY = rowTopY + buttonH + titleGap - logoDownShift;
         float titleX = (vw - titleW) * 0.5f;
 
         tanksText.setBounds(titleX, titleY, titleW, titleH);
