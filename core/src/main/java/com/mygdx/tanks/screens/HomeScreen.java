@@ -86,16 +86,16 @@ public class HomeScreen extends ScreenAdapter {
         final float vh = GameSettings.UI_VIEWPORT_HEIGHT;
 
         final int cols = 5;
-        final float marginX = vw * 0.05f;
-        final float marginY = vh * 0.05f;
-        final float gapX = vw * 0.012f;
-        final float rowGap = vh * 0.032f;
-        final float titleGap = vh * 0.028f;
+        final float marginX = vw * 0.035f;
+        final float marginY = vh * 0.045f;
+        final float gapX = vw * 0.008f;
+        final float rowGap = vh * 0.026f;
+        final float titleGap = vh * 0.022f;
 
         float availW = vw - 2f * marginX;
         float buttonW = (availW - gapX * (cols - 1)) / cols;
-        float buttonH = Math.min(vh * 0.24f, buttonW * 0.62f);
-        buttonH = Math.max(buttonH, vh * 0.11f);
+        float buttonH = Math.min(vh * 0.31f, buttonW * 0.74f);
+        buttonH = Math.max(buttonH, vh * 0.145f);
 
         float gridW = cols * buttonW + (cols - 1) * gapX;
         float gridH = 2f * buttonH + rowGap;
