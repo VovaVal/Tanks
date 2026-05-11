@@ -53,26 +53,89 @@ public class HomeScreen extends ScreenAdapter {
             GameSettings.UI_VIEWPORT_HEIGHT
         );
 
-        level1 = new ButtonView(0, 300, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 1");
-        level2 = new ButtonView(430, 300, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 2");
-        level3 = new ButtonView(860, 300, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 3");
-        level4 = new ButtonView(1290, 300, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 4");
-        level5 = new ButtonView(1720, 300, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 5");
-        level6 = new ButtonView(0, 50, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 6");
-        level7 = new ButtonView(430, 50, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 7");
-        level8 = new ButtonView(860, 50, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 8");
-        level9 = new ButtonView(1290, 50, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 9");
-        level10 = new ButtonView(1720, 50, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 10");
+        level1 = new ButtonView(0, 0, 10, 10, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 1");
+        level2 = new ButtonView(0, 0, 10, 10, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 2");
+        level3 = new ButtonView(0, 0, 10, 10, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 3");
+        level4 = new ButtonView(0, 0, 10, 10, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 4");
+        level5 = new ButtonView(0, 0, 10, 10, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 5");
+        level6 = new ButtonView(0, 0, 10, 10, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 6");
+        level7 = new ButtonView(0, 0, 10, 10, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 7");
+        level8 = new ButtonView(0, 0, 10, 10, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 8");
+        level9 = new ButtonView(0, 0, 10, 10, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 9");
+        level10 = new ButtonView(0, 0, 10, 10, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 10");
 
-        tanksText = new ImageView(800, 600, GameResources.TANKS_TEXT_IMG_PATH, 700, 600);
+        tanksText = new ImageView(0, 0, GameResources.TANKS_TEXT_IMG_PATH, 10, 10);
 
-        chains4 = new ImageView(1330, 380, GameResources.CHAINS_IMG_PATH, 400, 155);
-        chains5 = new ImageView(1770, 380, GameResources.CHAINS_IMG_PATH, 400, 155);
-        chains6 = new ImageView(40, 130, GameResources.CHAINS_IMG_PATH, 400, 155);
-        chains7 = new ImageView(480, 130, GameResources.CHAINS_IMG_PATH, 400, 155);
-        chains8 = new ImageView(910, 130, GameResources.CHAINS_IMG_PATH, 400, 155);
-        chains9 = new ImageView(1340, 130, GameResources.CHAINS_IMG_PATH, 400, 155);
-        chains10 = new ImageView(1775, 130, GameResources.CHAINS_IMG_PATH, 400, 155);
+        chains4 = new ImageView(0, 0, GameResources.CHAINS_IMG_PATH, 10, 10);
+        chains5 = new ImageView(0, 0, GameResources.CHAINS_IMG_PATH, 10, 10);
+        chains6 = new ImageView(0, 0, GameResources.CHAINS_IMG_PATH, 10, 10);
+        chains7 = new ImageView(0, 0, GameResources.CHAINS_IMG_PATH, 10, 10);
+        chains8 = new ImageView(0, 0, GameResources.CHAINS_IMG_PATH, 10, 10);
+        chains9 = new ImageView(0, 0, GameResources.CHAINS_IMG_PATH, 10, 10);
+        chains10 = new ImageView(0, 0, GameResources.CHAINS_IMG_PATH, 10, 10);
+
+        layoutMenu();
+    }
+
+    /**
+     * Раскладка меню в координатах виртуального холста: отступы и размеры как доли ширины/высоты,
+     * блок (заголовок + сетка уровней) центрируется по вертикали и горизонтали.
+     */
+    private void layoutMenu() {
+        final float vw = GameSettings.UI_VIEWPORT_WIDTH;
+        final float vh = GameSettings.UI_VIEWPORT_HEIGHT;
+
+        final int cols = 5;
+        final float marginX = vw * 0.05f;
+        final float marginY = vh * 0.05f;
+        final float gapX = vw * 0.012f;
+        final float rowGap = vh * 0.032f;
+        final float titleGap = vh * 0.028f;
+
+        float availW = vw - 2f * marginX;
+        float buttonW = (availW - gapX * (cols - 1)) / cols;
+        float buttonH = Math.min(vh * 0.24f, buttonW * 0.62f);
+        buttonH = Math.max(buttonH, vh * 0.11f);
+
+        float gridW = cols * buttonW + (cols - 1) * gapX;
+        float gridH = 2f * buttonH + rowGap;
+
+        final float titleAspect = 700f / 600f;
+        float titleW = Math.min(vw * 0.5f, gridW * 1.05f);
+        float titleH = titleW / titleAspect;
+        if (titleH > vh * 0.32f) {
+            titleH = vh * 0.32f;
+            titleW = titleH * titleAspect;
+        }
+
+        float contentH = titleH + titleGap + gridH;
+        float rowBottomY = Math.max(marginY, (vh - contentH) * 0.5f);
+        float rowTopY = rowBottomY + buttonH + rowGap;
+        float titleY = rowTopY + buttonH + titleGap;
+        float titleX = (vw - titleW) * 0.5f;
+
+        tanksText.setBounds(titleX, titleY, titleW, titleH);
+
+        float gridOriginX = (vw - gridW) * 0.5f;
+
+        ButtonView[] topRow = {level1, level2, level3, level4, level5};
+        ButtonView[] bottomRow = {level6, level7, level8, level9, level10};
+        for (int i = 0; i < cols; i++) {
+            float bx = gridOriginX + i * (buttonW + gapX);
+            bottomRow[i].setLayoutBounds(bx, rowBottomY, buttonW, buttonH);
+            topRow[i].setLayoutBounds(bx, rowTopY, buttonW, buttonH);
+        }
+
+        float chainW = Math.min(buttonW * 0.86f, vw * 0.15f);
+        float chainH = chainW * (155f / 400f);
+        ImageView[] chains = {chains4, chains5, chains6, chains7, chains8, chains9, chains10};
+        for (int i = 0; i < chains.length; i++) {
+            int level = 4 + i;
+            ButtonView btn = level <= 5 ? topRow[level - 1] : bottomRow[level - 6];
+            float cx = btn.x + btn.width * 0.5f - chainW * 0.5f;
+            float cy = btn.y + btn.height - chainH * 0.9f;
+            chains[i].setBounds(cx, cy, chainW, chainH);
+        }
     }
 
     @Override
@@ -85,6 +148,7 @@ public class HomeScreen extends ScreenAdapter {
     @Override
     public void resize(int width, int height) {
         uiViewport.update(width, height, true);
+        layoutMenu();
     }
 
     private void handleInput() {
@@ -178,6 +242,8 @@ public class HomeScreen extends ScreenAdapter {
         int bh = Gdx.graphics.getBackBufferHeight();
         if (bw > 0 && bh > 0) {
             resize(bw, bh);
+        } else {
+            layoutMenu();
         }
         myGdxGame.audioManager.menuMusicSound.play();
     }

@@ -55,6 +55,22 @@ public class ButtonView extends View {
         texture = new Texture(texturePath);
     }
 
+    /** Переставляет кнопку и заново центрирует подпись (для адаптивного меню). */
+    public void setLayoutBounds(float x, float y, float width, float height) {
+        super.setBounds(x, y, width, height);
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        if (bitmapFont != null) {
+            GlyphLayout glyphLayout = new GlyphLayout(bitmapFont, text);
+            float textWidth = glyphLayout.width;
+            float textHeight = glyphLayout.height;
+            textX = x + (width - textWidth) / 2f;
+            textY = y + (height + textHeight + 30f) / 2f;
+        }
+    }
+
     @Override
     public void draw(SpriteBatch batch) {
         batch.draw(texture, x, y, width, height);
