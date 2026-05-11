@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.GameSettings;
 import com.mygdx.tanks.Tanks;
@@ -14,7 +14,7 @@ import com.mygdx.tanks.components.BackgroundView;
 
 public class StartScreen extends ScreenAdapter {
     Tanks myGdxGame;
-    private FitViewport uiViewport;
+    private StretchViewport uiViewport;
     BackgroundView startBackground;
 
     private long startTime;
@@ -23,10 +23,14 @@ public class StartScreen extends ScreenAdapter {
     public StartScreen(Tanks myGdxGame) {
         this.myGdxGame = myGdxGame;
 
-        uiViewport = new FitViewport(GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT);
+        uiViewport = new StretchViewport(GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT);
         uiViewport.apply(true);
 
-        startBackground = new BackgroundView(GameResources.START_BACKGROUND_IMG_PATH, 2340, 1080);
+        startBackground = new BackgroundView(
+            GameResources.START_BACKGROUND_IMG_PATH,
+            GameSettings.UI_VIEWPORT_WIDTH,
+            GameSettings.UI_VIEWPORT_HEIGHT
+        );
         startTime = TimeUtils.millis();
 
         myGdxGame.audioManager.startScreenSound.play();
@@ -44,6 +48,15 @@ public class StartScreen extends ScreenAdapter {
     @Override
     public void resize(int width, int height) {
         uiViewport.update(width, height, true);
+    }
+
+    @Override
+    public void show() {
+        int bw = Gdx.graphics.getBackBufferWidth();
+        int bh = Gdx.graphics.getBackBufferHeight();
+        if (bw > 0 && bh > 0) {
+            resize(bw, bh);
+        }
     }
 
     private void draw() {

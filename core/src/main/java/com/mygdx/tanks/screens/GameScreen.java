@@ -21,6 +21,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.GameSession;
 import com.mygdx.tanks.GameSettings;
@@ -59,8 +60,13 @@ public class GameScreen extends ScreenAdapter {
 
     private OrthographicCamera gameCamera; // для мира
     private OrthographicCamera uiCamera;   // для UI
+    /** Полноэкранная подложка под картой (пиксели экрана), когда FitViewport оставляет поля по бокам. */
+    private OrthographicCamera screenFillCamera;
+    private int backBufferW = 1;
+    private int backBufferH = 1;
+    /** Карта без искажения пропорций; вся сетка видна, поля закрываются drawCover. */
     private FitViewport worldViewport;
-    private FitViewport uiViewport;
+    private StretchViewport uiViewport;
 
     public int tankLives = 3;
 
@@ -156,9 +162,17 @@ public class GameScreen extends ScreenAdapter {
         worldViewport = new FitViewport(mapWidth, mapHeight, gameCamera);
         worldViewport.apply(true);
 
+        screenFillCamera = new OrthographicCamera();
+
         uiCamera = new OrthographicCamera();
-        uiViewport = new FitViewport(GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT, uiCamera);
+        uiViewport = new StretchViewport(GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT, uiCamera);
         uiViewport.apply(true);
+
+        int bw = Gdx.graphics.getBackBufferWidth();
+        int bh = Gdx.graphics.getBackBufferHeight();
+        if (bw > 0 && bh > 0) {
+            resize(bw, bh);
+        }
 
         joystick = new VirtualJoystick(
             uiViewport,
@@ -328,6 +342,8 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void resize(int width, int height) {
+        backBufferW = Math.max(1, width);
+        backBufferH = Math.max(1, height);
         worldViewport.update(width, height, true);
         uiViewport.update(width, height, true);
     }
@@ -901,8 +917,18 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // МИР(объекты на карте и сама карта)
-        worldViewport.apply();
+        // Подложка на весь физический экран (под областью FitViewport — без чёрных полос по бокам)
+        Gdx.gl.glViewport(0, 0, backBufferW, backBufferH);
+        screenFillCamera.setToOrtho(false, backBufferW, backBufferH);
+        screenFillCamera.position.set(backBufferW * 0.5f, backBufferH * 0.5f, 0);
+        screenFillCamera.update();
+        myGdxGame.batch.setProjectionMatrix(screenFillCamera.combined);
+        myGdxGame.batch.begin();
+        backgroundView.drawCover(myGdxGame.batch, backBufferW, backBufferH);
+        myGdxGame.batch.end();
+
+        // МИР: карта ровно по сетке, без растягивания по осям
+        worldViewport.apply(true);
         gameCamera.update();
 
         myGdxGame.batch.setProjectionMatrix(gameCamera.combined);
@@ -976,7 +1002,13 @@ public class GameScreen extends ScreenAdapter {
     }
 
     @Override
-    public void show() {}
+    public void show() {
+        int bw = Gdx.graphics.getBackBufferWidth();
+        int bh = Gdx.graphics.getBackBufferHeight();
+        if (bw > 0 && bh > 0) {
+            resize(bw, bh);
+        }
+    }
 
     public void restart(String path) {
         System.out.println("Restarting game...");

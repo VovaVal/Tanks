@@ -2,8 +2,8 @@ package com.mygdx.tanks;
 
 public class GameSettings {
     /**
-     * Единое виртуальное разрешение для меню и HUD: всё рисуется в этих координатах,
-     * затем FitViewport масштабирует под любой физический экран без обрезания.
+     * Виртуальный холст для меню и HUD: координаты UI, затем StretchViewport на весь экран.
+     * Фоновые картинки меню нужно рисовать на весь этот размер, иначе по краям холста будут «полосы».
      */
     public static final int UI_VIEWPORT_WIDTH = 3000;
     public static final int UI_VIEWPORT_HEIGHT = 1200;

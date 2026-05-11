@@ -30,6 +30,21 @@ public class BackgroundView extends View {
             batch.draw(texture, 0, 0, width, height);
     }
 
+    /**
+     * Заполняет прямоугольник destW×destH текстурой с сохранением пропорций (как object-fit: cover).
+     * Используется под игровой FitViewport, чтобы по бокам не было пустого/чёрного фона.
+     */
+    public void drawCover(SpriteBatch batch, float destW, float destH) {
+        float tw = texture.getWidth();
+        float th = texture.getHeight();
+        float scale = Math.max(destW / tw, destH / th);
+        float drawW = tw * scale;
+        float drawH = th * scale;
+        float x = (destW - drawW) * 0.5f;
+        float y = (destH - drawH) * 0.5f;
+        batch.draw(texture, x, y, drawW, drawH);
+    }
+
     @Override
     public void dispose() {
         texture.dispose();

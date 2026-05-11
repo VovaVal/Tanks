@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.GameSettings;
 import com.mygdx.tanks.Tanks;
@@ -36,7 +36,7 @@ public class HomeScreen extends ScreenAdapter {
     ImageView chains8;
     ImageView chains9;
     ImageView chains10;
-    private FitViewport uiViewport;
+    private StretchViewport uiViewport;
     GameScreen gameScreen;
 
     public HomeScreen(Tanks myGdxGame) {
@@ -44,10 +44,14 @@ public class HomeScreen extends ScreenAdapter {
 
         gameScreen = new GameScreen(this.myGdxGame);
 
-        uiViewport = new FitViewport(GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT);
+        uiViewport = new StretchViewport(GameSettings.UI_VIEWPORT_WIDTH, GameSettings.UI_VIEWPORT_HEIGHT);
         uiViewport.apply(true);
 
-        homeBackground = new BackgroundView(GameResources.HOME_BACKGROUND_IMG_PATH, 2500, 1100);
+        homeBackground = new BackgroundView(
+            GameResources.HOME_BACKGROUND_IMG_PATH,
+            GameSettings.UI_VIEWPORT_WIDTH,
+            GameSettings.UI_VIEWPORT_HEIGHT
+        );
 
         level1 = new ButtonView(0, 300, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 1");
         level2 = new ButtonView(430, 300, 500, 300, myGdxGame.largeWhiteFont, GameResources.BUTTON_IMG_PATH, "level 2");
@@ -170,6 +174,11 @@ public class HomeScreen extends ScreenAdapter {
 
     @Override
     public void show() {
+        int bw = Gdx.graphics.getBackBufferWidth();
+        int bh = Gdx.graphics.getBackBufferHeight();
+        if (bw > 0 && bh > 0) {
+            resize(bw, bh);
+        }
         myGdxGame.audioManager.menuMusicSound.play();
     }
 
