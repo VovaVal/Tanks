@@ -34,8 +34,8 @@ android {
     applicationId 'com.mygdx.tanks'
     minSdkVersion 21
     targetSdkVersion 35
-    versionCode 1
-    versionName "1.0"
+    versionCode 2
+    versionName "1.1"
   }
   compileOptions {
     sourceCompatibility "8"
