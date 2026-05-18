@@ -67,6 +67,9 @@ public class GameSettings {
     public static final int TILE_SPAWN = 6;
 
     // Параметры
+    /** Авто-выстрел каждого игрока в режиме «с друзьями» */
+    public static final float FRIENDS_AUTO_SHOOT_INTERVAL_SEC = 1f;
+
     public static final int SHOOTING_COOL_DOWN = 500; // ms
     public static final int SHOOTING_COOL_DOWN_ENEMIES = 1500; // ms
     public static final int NEXT_MOVE = 3000;

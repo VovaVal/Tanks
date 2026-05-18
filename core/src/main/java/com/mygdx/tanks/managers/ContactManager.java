@@ -107,7 +107,11 @@ public class ContactManager {
                         if (!tank.isAlive()) {
                             audioManager.tankDiedMain.play();
                             tank.setDestroyed(true);
-                            gameScreen.tankLives--;
+                            if (gameScreen.isFriendsMode()) {
+                                gameScreen.onFriendsPlayerTankLost();
+                            } else {
+                                gameScreen.tankLives--;
+                            }
                         }
                     } else if (!bullet.isEnemyBullet() && tank.isEnemy()) {
                         tank.hit();

@@ -34,6 +34,9 @@ public class Tanks extends Game {
 
     public AudioManager audioManager;
 
+    /** Режим игры и число игроков с экрана уровней */
+    public final MenuPlaySettings menuPlaySettings = new MenuPlaySettings();
+
     public BitmapFont largeWhiteFont;
     public BitmapFont commonWhiteFont;
     public BitmapFont commonBlackFont;

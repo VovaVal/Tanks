@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class VirtualJoystick {
@@ -45,10 +46,31 @@ public class VirtualJoystick {
         this.targetPoint = new Vector2(x, y);
     }
 
+    public int getActivePointer() {
+        return activePointer;
+    }
+
+    public void setCenter(float x, float y) {
+        center.set(x, y);
+        touchPoint.set(x, y);
+        targetPoint.set(x, y);
+    }
+
+    public void setRadii(float outer, float inner) {
+        this.outerRadius = outer;
+        this.innerRadius = inner;
+    }
+
     public void update() {
+        update(null);
+    }
+
+    /** @param blockedPointers пальцы, уже заняты другими джойстиками */
+    public void update(IntArray blockedPointers) {
         if (activePointer == -1) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < Gdx.input.getMaxPointers(); i++) {
                 if (!Gdx.input.isTouched(i)) continue;
+                if (blockedPointers != null && blockedPointers.contains(i)) continue;
 
                 Vector3 touch = new Vector3(Gdx.input.getX(i), Gdx.input.getY(i), 0);
                 viewport.unproject(touch);

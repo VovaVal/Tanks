@@ -10,9 +10,12 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.GameSettings;
 import com.mygdx.tanks.Tanks;
+import com.mygdx.tanks.GamePlayMode;
 import com.mygdx.tanks.components.BackgroundView;
 import com.mygdx.tanks.components.ButtonView;
 import com.mygdx.tanks.components.ImageView;
+import com.mygdx.tanks.components.ModeToggleView;
+import com.mygdx.tanks.components.PlayerCountDropdown;
 import com.mygdx.tanks.managers.MemoryManager;
 
 public class HomeScreen extends ScreenAdapter {
@@ -38,6 +41,9 @@ public class HomeScreen extends ScreenAdapter {
     ImageView chains10;
     private StretchViewport uiViewport;
     GameScreen gameScreen;
+
+    private ModeToggleView modeToggle;
+    private PlayerCountDropdown playerCountDropdown;
 
     public HomeScreen(Tanks myGdxGame) {
         this.myGdxGame = myGdxGame;
@@ -74,6 +80,12 @@ public class HomeScreen extends ScreenAdapter {
         chains9 = new ImageView(0, 0, GameResources.CHAINS_IMG_PATH, 10, 10);
         chains10 = new ImageView(0, 0, GameResources.CHAINS_IMG_PATH, 10, 10);
 
+        modeToggle = new ModeToggleView(myGdxGame.largeWhiteFont);
+        modeToggle.setMode(myGdxGame.menuPlaySettings.getMode());
+
+        playerCountDropdown = new PlayerCountDropdown(myGdxGame.largeWhiteFont);
+        playerCountDropdown.setSelectedCount(myGdxGame.menuPlaySettings.getFriendPlayerCount());
+
         layoutMenu();
     }
 
@@ -108,8 +120,19 @@ public class HomeScreen extends ScreenAdapter {
             titleW = titleH * titleAspect;
         }
 
+        final float toggleW = Math.min(vw * 0.72f, 1100f);
+        final float toggleH = Math.max(vh * 0.1f, 110f);
+        final float dropdownH = Math.max(vh * 0.085f, 95f);
+        final float modeGap = vh * 0.018f;
+        float modeBlockH = toggleH;
+        if (myGdxGame.menuPlaySettings.isWithFriends()) {
+            modeBlockH += modeGap + dropdownH;
+        }
+        final float reservedTop = modeBlockH + marginY * 1.6f;
+
         float contentH = titleH + titleGap + gridH;
-        float rowBottomY = Math.max(marginY, (vh - contentH) * 0.5f);
+        float availH = vh - reservedTop - marginY;
+        float rowBottomY = Math.max(marginY, marginY + (availH - contentH) * 0.5f);
         float rowTopY = rowBottomY + buttonH + rowGap;
         // Опускаем логотип ближе к верхнему ряду кнопок (не меняем contentH — лёгкое перекрытие по вертикали)
         final float logoDownShift = vh * 0.055f;
@@ -139,6 +162,21 @@ public class HomeScreen extends ScreenAdapter {
             float cy = btn.y + btn.height * 0.62f - chainH * 0.55f;
             chains[i].setBounds(cx, cy, chainW, chainH);
         }
+
+        layoutModeControls(vw, vh, marginY, toggleW, toggleH, dropdownH, modeGap);
+    }
+
+    /** Блок режима — вверху по центру, крупный, отдельная полоса над контентом. */
+    private void layoutModeControls(float vw, float vh, float marginY,
+                                    float toggleW, float toggleH, float dropdownH, float modeGap) {
+        float panelX = (vw - toggleW) * 0.5f;
+        float toggleY = vh - marginY - toggleH;
+
+        modeToggle.setBounds(panelX, toggleY, toggleW, toggleH);
+
+        if (myGdxGame.menuPlaySettings.isWithFriends()) {
+            playerCountDropdown.setBounds(panelX, toggleY - modeGap - dropdownH, toggleW, dropdownH);
+        }
     }
 
     @Override
@@ -155,52 +193,78 @@ public class HomeScreen extends ScreenAdapter {
     }
 
     private void handleInput() {
-        if (Gdx.input.justTouched()) {
-            Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-            uiViewport.unproject(touchPos);
+        if (!Gdx.input.justTouched()) return;
 
-            if (level1.isHit(touchPos.x, touchPos.y)) {
-                myGdxGame.audioManager.btnClick.play();
-                gameScreen.restart("maps/map_1.tmx");
-                myGdxGame.setScreen(gameScreen);
-            } else if (level2.isHit(touchPos.x, touchPos.y)) {
-                myGdxGame.audioManager.btnClick.play();
-                gameScreen.restart("maps/map_2.tmx");
-                myGdxGame.setScreen(gameScreen);
-            } else if (level3.isHit(touchPos.x, touchPos.y)) {
-                myGdxGame.audioManager.btnClick.play();
-                gameScreen.restart("maps/map_3.tmx");
-                myGdxGame.setScreen(gameScreen);
-            } else if (level4.isHit(touchPos.x, touchPos.y) && 4 <= MemoryManager.getMaxLevel()) {
-                myGdxGame.audioManager.btnClick.play();
-                gameScreen.restart("maps/map_4.tmx");
-                myGdxGame.setScreen(gameScreen);
-            } else if (level5.isHit(touchPos.x, touchPos.y) && 5 <= MemoryManager.getMaxLevel()) {
-                myGdxGame.audioManager.btnClick.play();
-                gameScreen.restart("maps/map_5.tmx");
-                myGdxGame.setScreen(gameScreen);
-            } else if (level6.isHit(touchPos.x, touchPos.y) && 6 <= MemoryManager.getMaxLevel()) {
-                myGdxGame.audioManager.btnClick.play();
-                gameScreen.restart("maps/map_6.tmx");
-                myGdxGame.setScreen(gameScreen);
-            } else if (level7.isHit(touchPos.x, touchPos.y) && 7 <= MemoryManager.getMaxLevel()) {
-                myGdxGame.audioManager.btnClick.play();
-                gameScreen.restart("maps/map_7.tmx");
-                myGdxGame.setScreen(gameScreen);
-            } else if (level8.isHit(touchPos.x, touchPos.y) && 8 <= MemoryManager.getMaxLevel()) {
-                myGdxGame.audioManager.btnClick.play();
-                gameScreen.restart("maps/map_8.tmx");
-                myGdxGame.setScreen(gameScreen);
-            } else if (level9.isHit(touchPos.x, touchPos.y) && 9 <= MemoryManager.getMaxLevel()) {
-                myGdxGame.audioManager.btnClick.play();
-                gameScreen.restart("maps/map_9.tmx");
-                myGdxGame.setScreen(gameScreen);
-            } else if (level10.isHit(touchPos.x, touchPos.y) && 10 <= MemoryManager.getMaxLevel()) {
-                myGdxGame.audioManager.btnClick.play();
-                gameScreen.restart("maps/map_10.tmx");
-                myGdxGame.setScreen(gameScreen);
-            }
+        Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        uiViewport.unproject(touchPos);
+
+        if (handleModeControlsInput(touchPos.x, touchPos.y)) {
+            return;
         }
+
+        if (level1.isHit(touchPos.x, touchPos.y)) {
+            startLevel("maps/map_1.tmx");
+        } else if (level2.isHit(touchPos.x, touchPos.y)) {
+            startLevel("maps/map_2.tmx");
+        } else if (level3.isHit(touchPos.x, touchPos.y)) {
+            startLevel("maps/map_3.tmx");
+        } else if (level4.isHit(touchPos.x, touchPos.y) && 4 <= MemoryManager.getMaxLevel()) {
+            startLevel("maps/map_4.tmx");
+        } else if (level5.isHit(touchPos.x, touchPos.y) && 5 <= MemoryManager.getMaxLevel()) {
+            startLevel("maps/map_5.tmx");
+        } else if (level6.isHit(touchPos.x, touchPos.y) && 6 <= MemoryManager.getMaxLevel()) {
+            startLevel("maps/map_6.tmx");
+        } else if (level7.isHit(touchPos.x, touchPos.y) && 7 <= MemoryManager.getMaxLevel()) {
+            startLevel("maps/map_7.tmx");
+        } else if (level8.isHit(touchPos.x, touchPos.y) && 8 <= MemoryManager.getMaxLevel()) {
+            startLevel("maps/map_8.tmx");
+        } else if (level9.isHit(touchPos.x, touchPos.y) && 9 <= MemoryManager.getMaxLevel()) {
+            startLevel("maps/map_9.tmx");
+        } else if (level10.isHit(touchPos.x, touchPos.y) && 10 <= MemoryManager.getMaxLevel()) {
+            startLevel("maps/map_10.tmx");
+        }
+    }
+
+    private boolean handleModeControlsInput(float tx, float ty) {
+        if (myGdxGame.menuPlaySettings.isWithFriends() && playerCountDropdown.isHit(tx, ty)) {
+            playerCountDropdown.handleTouch(tx, ty);
+            myGdxGame.menuPlaySettings.setFriendPlayerCount(playerCountDropdown.getSelectedCount());
+            myGdxGame.audioManager.btnClick.play();
+            layoutMenu();
+            return true;
+        }
+
+        if (modeToggle.isHit(tx, ty)) {
+            int seg = modeToggle.hitSegment(tx, ty);
+            if (seg >= 0) {
+                GamePlayMode next = seg == 0 ? GamePlayMode.SINGLE : GamePlayMode.WITH_FRIENDS;
+                if (next != modeToggle.getMode()) {
+                    modeToggle.setMode(next);
+                    myGdxGame.menuPlaySettings.setMode(next);
+                    if (next == GamePlayMode.WITH_FRIENDS) {
+                        playerCountDropdown.setExpanded(false);
+                    }
+                    layoutMenu();
+                }
+                myGdxGame.audioManager.btnClick.play();
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private void startLevel(String mapPath) {
+        syncMenuSettingsFromUi();
+        gameScreen.applyMenuSettings(myGdxGame.menuPlaySettings);
+        myGdxGame.audioManager.btnClick.play();
+        gameScreen.restart(mapPath);
+        myGdxGame.setScreen(gameScreen);
+    }
+
+    private void syncMenuSettingsFromUi() {
+        myGdxGame.menuPlaySettings.setMode(modeToggle.getMode());
+        myGdxGame.menuPlaySettings.setFriendPlayerCount(playerCountDropdown.getSelectedCount());
     }
 
     private void draw() {
@@ -235,6 +299,13 @@ public class HomeScreen extends ScreenAdapter {
         if(!(8 <= MemoryManager.getMaxLevel())) chains8.draw(myGdxGame.batch);
         if(!(9 <= MemoryManager.getMaxLevel())) chains9.draw(myGdxGame.batch);
         if(!(10 <= MemoryManager.getMaxLevel())) chains10.draw(myGdxGame.batch);
+
+        if (modeToggle != null) {
+            modeToggle.draw(myGdxGame.batch);
+        }
+        if (myGdxGame.menuPlaySettings.isWithFriends() && playerCountDropdown != null) {
+            playerCountDropdown.draw(myGdxGame.batch);
+        }
 
         myGdxGame.batch.end();
     }
@@ -272,5 +343,7 @@ public class HomeScreen extends ScreenAdapter {
         if (level10 != null) level10.dispose();
 
         if (tanksText != null) tanksText.dispose();
+        if (modeToggle != null) modeToggle.dispose();
+        if (playerCountDropdown != null) playerCountDropdown.dispose();
     }
 }

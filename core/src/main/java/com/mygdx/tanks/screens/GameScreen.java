@@ -18,12 +18,16 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.mygdx.tanks.GamePlayMode;
+import com.mygdx.tanks.LocalPlayerSlot;
 import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.GameSession;
 import com.mygdx.tanks.GameSettings;
+import com.mygdx.tanks.MenuPlaySettings;
 import com.mygdx.tanks.Effect;
 import com.mygdx.tanks.GameState;
 import com.mygdx.tanks.Tanks;
@@ -131,6 +135,14 @@ public class GameScreen extends ScreenAdapter {
     private ArrayList<BonusObject> bonuses;
     private float bonusSpawnTimer = 0f;
     public boolean playerWin;
+
+    public GamePlayMode playMode = GamePlayMode.SINGLE;
+    public int friendPlayerCount = MenuPlaySettings.MIN_FRIEND_PLAYERS;
+
+    private final ArrayList<LocalPlayerSlot> localPlayers = new ArrayList<>();
+    private static final float MP_JOYSTICK_OUTER = 200f;
+    private static final float MP_JOYSTICK_INNER = 130f;
+    private static final float MP_JOYSTICK_Y = 240f;
 
 
     public GameScreen(Tanks myGdxGame) {
@@ -259,19 +271,245 @@ public class GameScreen extends ScreenAdapter {
             spawnEnemyIfPossible();
         }
 
-        playerSpawning = true;
-        Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
-        effect.isPlayerSpawn = true;
-        spawnEffects.add(effect);
+        spawnPlayersForCurrentMode();
 
         enemiesSpawned = 4;
         enemiesKilled = 0;
 
-        liveView.setLeftLives(3);
+        liveView.setLeftLives(tankLives);
 
         layoutTopRightHud();
 
         playerSpawning = false;
+    }
+
+    public boolean isFriendsMode() {
+        return playMode == GamePlayMode.WITH_FRIENDS;
+    }
+
+    public void onFriendsPlayerTankLost() {
+        tankLives = countAliveLocalPlayers();
+        if (tankLives <= 0) {
+            gameSession.state = GameState.ENDED;
+            playerWin = false;
+        }
+    }
+
+    private int countAliveLocalPlayers() {
+        int alive = 0;
+        for (LocalPlayerSlot slot : localPlayers) {
+            if (slot.isAlive()) alive++;
+        }
+        return alive;
+    }
+
+    private void spawnPlayersForCurrentMode() {
+        if (isFriendsMode()) {
+            tankObject = null;
+            disposeLocalPlayerJoysticks();
+            localPlayers.clear();
+            playerDead = false;
+            playerSpawning = true;
+            tankLives = friendPlayerCount;
+
+            for (int i = 0; i < friendPlayerCount; i++) {
+                localPlayers.add(new LocalPlayerSlot(i));
+                Vector2 pos = getMultiplayerSpawnPosition(i, friendPlayerCount);
+                Effect effect = new Effect(spawnFrames, pos, 0.23f, GameSettings.TANK_PIXEL_SIZE);
+                effect.isPlayerSpawn = true;
+                effect.playerSpawnSlot = i;
+                spawnEffects.add(effect);
+            }
+            setupMultiplayerJoysticks();
+        } else {
+            disposeLocalPlayerJoysticks();
+            localPlayers.clear();
+            playerSpawning = true;
+            Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
+            effect.isPlayerSpawn = true;
+            effect.playerSpawnSlot = -1;
+            spawnEffects.add(effect);
+            tankLives = 3;
+        }
+    }
+
+    private Vector2 getMultiplayerSpawnPosition(int index, int total) {
+        Vector2 base = tankSpawnMain.cpy();
+        float d = GameSettings.TILE_SIZE * 1.4f;
+        switch (total) {
+            case 2:
+                base.add(index == 0 ? -d : d, 0);
+                break;
+            case 3:
+                if (index == 0) base.add(-d, 0);
+                else if (index == 1) base.add(0, d);
+                else base.add(d, 0);
+                break;
+            default:
+                if (index == 0) base.add(-d, d);
+                else if (index == 1) base.add(d, d);
+                else if (index == 2) base.add(-d, -d);
+                else base.add(d, -d);
+                break;
+        }
+        return base;
+    }
+
+    private void spawnTankForSlot(int slotIndex, Vector2 position) {
+        TankObject playerTank = new TankObject(
+            (int) position.x,
+            (int) position.y,
+            GameSettings.TANK_PIXEL_SIZE,
+            GameSettings.TANK_PIXEL_SIZE,
+            GameResources.TANK_IMG_PATH,
+            myGdxGame.world,
+            false,
+            1
+        );
+        playerTank.angleDeg = 0;
+        localPlayers.get(slotIndex).tank = playerTank;
+        if (slotIndex == 0) {
+            tankObject = playerTank;
+        }
+    }
+
+    private void setupMultiplayerJoysticks() {
+        int n = localPlayers.size();
+        float vw = GameSettings.UI_VIEWPORT_WIDTH;
+        float margin = vw * 0.08f;
+        float span = vw - 2f * margin;
+
+        for (int i = 0; i < n; i++) {
+            LocalPlayerSlot slot = localPlayers.get(i);
+            float centerX = margin + span * (i + 0.5f) / n;
+            if (slot.joystick == null) {
+                slot.joystick = new VirtualJoystick(
+                    uiViewport,
+                    centerX, MP_JOYSTICK_Y,
+                    MP_JOYSTICK_OUTER, MP_JOYSTICK_INNER,
+                    GameResources.BACKGROUND_CONTROLLER_IMG_PATH,
+                    GameResources.CONTROLLER_IMG_PATH
+                );
+            } else {
+                slot.joystick.setCenter(centerX, MP_JOYSTICK_Y);
+                slot.joystick.setRadii(MP_JOYSTICK_OUTER, MP_JOYSTICK_INNER);
+            }
+        }
+    }
+
+    private void disposeLocalPlayerJoysticks() {
+        for (LocalPlayerSlot slot : localPlayers) {
+            if (slot.joystick != null) {
+                slot.joystick.dispose();
+                slot.joystick = null;
+            }
+            slot.tank = null;
+        }
+        localPlayers.clear();
+    }
+
+    private void updateMultiplayerControls(float delta) {
+        IntArray usedPointers = new IntArray();
+        for (LocalPlayerSlot slot : localPlayers) {
+            if (slot.joystick == null) continue;
+            slot.joystick.update(usedPointers);
+            int pointer = slot.joystick.getActivePointer();
+            if (pointer >= 0) {
+                usedPointers.add(pointer);
+            }
+
+            TankObject tank = slot.tank;
+            if (tank == null || tank.isDestroyed() || !tank.isAlive()) {
+                continue;
+            }
+            applyTankMovement(tank, slot.joystick.getDirection());
+        }
+    }
+
+    private void updateFriendsAutoShoot(float delta) {
+        for (LocalPlayerSlot slot : localPlayers) {
+            TankObject tank = slot.tank;
+            if (tank == null || tank.isDestroyed() || !tank.isAlive()) {
+                continue;
+            }
+            slot.autoShootTimer += delta;
+            if (slot.autoShootTimer >= GameSettings.FRIENDS_AUTO_SHOOT_INTERVAL_SEC) {
+                slot.autoShootTimer = 0f;
+                fireBulletFromTank(tank);
+            }
+        }
+    }
+
+    private void applyTankMovement(TankObject tank, Vector2 dir) {
+        if (dir.len() > 0) {
+            float absX = Math.abs(dir.x);
+            float absY = Math.abs(dir.y);
+            if (absX > absY) {
+                dir.y = 0;
+                dir.x = Math.signum(dir.x);
+                tank.angleDeg = (dir.x > 0) ? 270 : 90;
+            } else {
+                dir.x = 0;
+                dir.y = Math.signum(dir.y);
+                tank.angleDeg = (dir.y > 0) ? 0 : 180;
+            }
+            tank.move(dir);
+        } else {
+            tank.stop();
+        }
+    }
+
+    private void fireBulletFromTank(TankObject tank) {
+        if (tank == null || tank.isDestroyed()) return;
+
+        tank.shoot();
+        myGdxGame.audioManager.shoot.play();
+
+        int x = tank.getX();
+        int y = tank.getY();
+        int offset = 45;
+        Vector2 bulletDir = new Vector2();
+        switch ((int) tank.angleDeg) {
+            case 0:
+            case 360:
+                bulletDir.set(0, 1);
+                y += offset;
+                break;
+            case 180:
+                bulletDir.set(0, -1);
+                y -= offset;
+                break;
+            case 90:
+                bulletDir.set(-1, 0);
+                x -= offset;
+                break;
+            case 270:
+                bulletDir.set(1, 0);
+                x += offset;
+                break;
+            default:
+                bulletDir.set(0, 1);
+                y += offset;
+                break;
+        }
+
+        BulletObject bulletObject = new BulletObject(
+            x, y, GameSettings.BULLET_PIXEL_SIZE, GameSettings.BULLET_PIXEL_SIZE,
+            GameResources.BULLET_IMG_PATH, myGdxGame.world, bulletDir, tank, false
+        );
+        bullets.add(bulletObject);
+    }
+
+    public TankObject getLeadPlayerTank() {
+        if (!isFriendsMode()) {
+            return tankObject;
+        }
+        for (LocalPlayerSlot slot : localPlayers) {
+            if (slot.isAlive()) {
+                return slot.tank;
+            }
+        }
+        return null;
     }
 
     private void addMap() {
@@ -348,6 +586,9 @@ public class GameScreen extends ScreenAdapter {
         backBufferH = Math.max(1, height);
         worldViewport.update(width, height, true);
         uiViewport.update(width, height, true);
+        if (isFriendsMode() && !localPlayers.isEmpty()) {
+            setupMultiplayerJoysticks();
+        }
     }
 
     private void spawnEnemyIfPossible() {
@@ -405,21 +646,26 @@ public class GameScreen extends ScreenAdapter {
             if (effect.finished) {
 
                 if (effect.isPlayerSpawn) {
-                    tankObject = new TankObject(
-                        (int) effect.position.x,
-                        (int) effect.position.y,
-                        GameSettings.TANK_PIXEL_SIZE,
-                        GameSettings.TANK_PIXEL_SIZE,
-                        GameResources.TANK_IMG_PATH,
-                        myGdxGame.world,
-                        false,
-                        1
-                    );
-
-                    tankObject.angleDeg = 0;
-
+                    if (effect.playerSpawnSlot >= 0 && effect.playerSpawnSlot < localPlayers.size()) {
+                        spawnTankForSlot(effect.playerSpawnSlot, effect.position);
+                        if (effect.playerSpawnSlot == friendPlayerCount - 1) {
+                            playerSpawning = false;
+                        }
+                    } else {
+                        tankObject = new TankObject(
+                            (int) effect.position.x,
+                            (int) effect.position.y,
+                            GameSettings.TANK_PIXEL_SIZE,
+                            GameSettings.TANK_PIXEL_SIZE,
+                            GameResources.TANK_IMG_PATH,
+                            myGdxGame.world,
+                            false,
+                            1
+                        );
+                        tankObject.angleDeg = 0;
+                        playerSpawning = false;
+                    }
                     playerDead = false;
-                    playerSpawning = false;
                 } else {
                     TankObject enemy = new TankObject(
                         (int) effect.position.x,
@@ -482,9 +728,17 @@ public class GameScreen extends ScreenAdapter {
 
         updateSpawnEffects(Gdx.graphics.getDeltaTime());
         updateDeathEffects(Gdx.graphics.getDeltaTime());
-        updatePlayerRespawn(Gdx.graphics.getDeltaTime());
+        if (!isFriendsMode()) {
+            updatePlayerRespawn(Gdx.graphics.getDeltaTime());
+        } else {
+            updateFriendsDestroyedTanks();
+        }
 
-        if (tankLives == 0) {
+        if (!isFriendsMode() && tankLives == 0) {
+            gameSession.state = GameState.ENDED;
+            playerWin = false;
+        }
+        if (isFriendsMode() && countAliveLocalPlayers() == 0 && !playerSpawning) {
             gameSession.state = GameState.ENDED;
             playerWin = false;
         }
@@ -505,9 +759,20 @@ public class GameScreen extends ScreenAdapter {
             }
         }
 
-        liveView.setLeftLives(tankLives);
+        if (isFriendsMode()) {
+            liveView.setLeftLives(countAliveLocalPlayers());
+        } else {
+            liveView.setLeftLives(tankLives);
+        }
         tanksKilledText.setText(String.valueOf(enemiesKilled) + " ");
-        if (gameSession.state == GameState.PLAYING) joystick.update();
+        if (gameSession.state == GameState.PLAYING) {
+            if (isFriendsMode()) {
+                updateMultiplayerControls(delta);
+                updateFriendsAutoShoot(delta);
+            } else if (!playerDead && tankObject != null) {
+                joystick.update();
+            }
+        }
         updateBullets();
         updateWalls();
         if (gameSession.state == GameState.PLAYING) updateEnemyTanks();
@@ -529,7 +794,13 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void updateBonusTimers(float delta) {
-        if (tankObject != null) {
+        if (isFriendsMode()) {
+            for (LocalPlayerSlot slot : localPlayers) {
+                if (slot.tank != null) {
+                    slot.tank.updateBonuses();
+                }
+            }
+        } else if (tankObject != null) {
             tankObject.updateBonuses();
         }
 
@@ -585,12 +856,20 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private boolean isTooCloseToPlayer(float x, float y) {
+        float minDistance = 200f;
+        if (isFriendsMode()) {
+            for (LocalPlayerSlot slot : localPlayers) {
+                if (slot.tank == null) continue;
+                float dx = Math.abs(slot.tank.getX() - x);
+                float dy = Math.abs(slot.tank.getY() - y);
+                if (dx < minDistance && dy < minDistance) return true;
+            }
+            return false;
+        }
         if (tankObject == null) return false;
 
         float dx = Math.abs(tankObject.getX() - x);
         float dy = Math.abs(tankObject.getY() - y);
-        float minDistance = 200f; // Минимальное расстояние от игрока
-
         return dx < minDistance && dy < minDistance;
     }
 
@@ -616,8 +895,26 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
+    private void updateFriendsDestroyedTanks() {
+        for (LocalPlayerSlot slot : localPlayers) {
+            TankObject tank = slot.tank;
+            if (tank == null || !tank.isDestroyed() || slot.deathProcessed) {
+                continue;
+            }
+            slot.deathProcessed = true;
+            tank.disablePhysics();
+            playDeath(tank);
+            if (tank.body != null) {
+                myGdxGame.world.destroyBody(tank.body);
+            }
+            slot.tank = null;
+        }
+        tankObject = getLeadPlayerTank();
+        tankLives = countAliveLocalPlayers();
+    }
+
     private void updatePlayerRespawn(float delta) {
-        if (tankObject == null) return;
+        if (isFriendsMode() || tankObject == null) return;
 
         if (tankObject.isDestroyed() && !playerDead) {
             playerDead = true;
@@ -697,86 +994,28 @@ public class GameScreen extends ScreenAdapter {
 
                 switch (gameSession.state) {
                     case PLAYING:
-                        if (shootPointer == -1 && shootButton.isHit(touchPos.x, touchPos.y) && !playerDead) {
-                            shootPointer = i;  // Запоминаем, какой палец нажал кнопку
-                            System.out.println("Shoot button pressed!");
-                        }
-
                         if (pauseBtnImg.isHit(touchPos.x, touchPos.y)) {
-                            System.out.println("Pause!");
                             myGdxGame.audioManager.btnClick.play();
                             gameSession.pauseGame();
                         }
 
-                        if (shootPointer == i && !playerDead && tankObject != null && gameSession.state == GameState.PLAYING) {
-                            if (tankObject.canShoot()) {
-                                tankObject.shoot();
-                                myGdxGame.audioManager.shoot.play();
-                                System.out.println("Shoot!");
-
-                                int x = tankObject.getX();
-                                int y = tankObject.getY();
-
-                                int offset = 45;
-
-                                Vector2 bulletDir = new Vector2();
-                                switch ((int) tankObject.angleDeg) {
-                                    case 0:
-                                    case 360:
-                                        bulletDir.set(0, 1);
-                                        y += offset;
-                                        break;
-                                    case 180:
-                                        bulletDir.set(0, -1);
-                                        y -= offset;
-                                        break;
-                                    case 90:
-                                        bulletDir.set(-1, 0);
-                                        x -= offset;
-                                        break;
-                                    case 270:
-                                        bulletDir.set(1, 0);
-                                        x += offset;
-                                        break;
-                                }
-
-                                BulletObject bulletObject = new BulletObject(
-                                    x, y, GameSettings.BULLET_PIXEL_SIZE, GameSettings.BULLET_PIXEL_SIZE,
-                                    GameResources.BULLET_IMG_PATH, myGdxGame.world, bulletDir, tankObject, false
-                                );
-
-                                bullets.add(bulletObject);
+                        if (!isFriendsMode()) {
+                            if (shootPointer == -1 && shootButton.isHit(touchPos.x, touchPos.y) && !playerDead) {
+                                shootPointer = i;
                             }
-                        }
 
-                        if (joystickPointer == -1) {
-                            joystickPointer = i;  // Запоминаем палец для джойстика
-                            System.out.println("Joystick pressed!");
-                        }
-
-                        if (joystickPointer == i && !playerDead && tankObject != null && gameSession.state == GameState.PLAYING) {
-                            Vector2 dir = joystick.getDirection();
-
-                            if (dir.len() > 0) {
-                                float absX = Math.abs(dir.x);
-                                float absY = Math.abs(dir.y);
-
-                                if (absX > absY) {
-                                    dir.y = 0;
-                                    dir.x = Math.signum(dir.x);
-                                    tankObject.angleDeg = (dir.x > 0) ? 270 : 90;
-                                } else {
-                                    dir.x = 0;
-                                    dir.y = Math.signum(dir.y);
-                                    tankObject.angleDeg = (dir.y > 0) ? 0 : 180;
+                            if (shootPointer == i && !playerDead && tankObject != null) {
+                                if (tankObject.canShoot()) {
+                                    fireBulletFromTank(tankObject);
                                 }
+                            }
 
-                                float speed = GameSettings.TANK_SPEED;
-                                float deltaX = dir.x * speed * Gdx.graphics.getDeltaTime();
-                                float deltaY = dir.y * speed * Gdx.graphics.getDeltaTime();
-                                tankObject.move(dir);
-                            } else {
-                                tankObject.stop();
+                            if (joystickPointer == -1) {
+                                joystickPointer = i;
+                            }
+
+                            if (joystickPointer == i && !playerDead && tankObject != null) {
+                                applyTankMovement(tankObject, joystick.getDirection());
                             }
                         }
                         break;
@@ -846,10 +1085,11 @@ public class GameScreen extends ScreenAdapter {
             }
 
             if (tanks.get(i).isEnemy() && !tanks.get(i).isDestroyed() && tanks.get(i) != null) {
-                if (tankObject != null && tankObject.isEnemyFrozen() && tanks.get(i) != null) {
+                TankObject lead = getLeadPlayerTank();
+                if (lead != null && lead.isEnemyFrozen() && tanks.get(i) != null) {
                     tanks.get(i).stop();
                 } else if (tanks.get(i) != null) {
-                    tanks.get(i).enemyMove(tankObject, walls);
+                    tanks.get(i).enemyMove(lead, walls);
                 }
 
                 if (!tanks.get(i).isAlive()){
@@ -862,7 +1102,8 @@ public class GameScreen extends ScreenAdapter {
                 }
 
                 if (tanks.get(i).canShoot()) {
-                    if (tankObject != null && tankObject.isEnemyFrozen()) {
+                    lead = getLeadPlayerTank();
+                    if (lead != null && lead.isEnemyFrozen()) {
                         continue;
                     }
                     tanks.get(i).shoot();
@@ -1042,7 +1283,15 @@ public class GameScreen extends ScreenAdapter {
             effect.draw(myGdxGame.batch);
         }
 
-        if (tankObject != null && !tankObject.isDestroyed()) tankObject.draw(myGdxGame.batch);
+        if (isFriendsMode()) {
+            for (LocalPlayerSlot slot : localPlayers) {
+                if (slot.tank != null && !slot.tank.isDestroyed()) {
+                    slot.tank.draw(myGdxGame.batch);
+                }
+            }
+        } else if (tankObject != null && !tankObject.isDestroyed()) {
+            tankObject.draw(myGdxGame.batch);
+        }
         for (TankObject tank : tanks) tank.draw(myGdxGame.batch);
         for (WallsObject wall : walls)
             if (wall.getType() == GameSettings.TILE_EAGLE) {
@@ -1077,8 +1326,16 @@ public class GameScreen extends ScreenAdapter {
         layoutTopRightHud();
         myGdxGame.batch.begin();
 
-        joystick.draw(myGdxGame.batch);
-        shootButton.draw(myGdxGame.batch);
+        if (isFriendsMode()) {
+            for (LocalPlayerSlot slot : localPlayers) {
+                if (slot.joystick != null) {
+                    slot.joystick.draw(myGdxGame.batch);
+                }
+            }
+        } else {
+            joystick.draw(myGdxGame.batch);
+            shootButton.draw(myGdxGame.batch);
+        }
         liveView.draw(myGdxGame.batch);
         tanksKilledText.draw(myGdxGame.batch);
         tanksAllText.draw(myGdxGame.batch);
@@ -1119,6 +1376,12 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
+    public void applyMenuSettings(MenuPlaySettings settings) {
+        if (settings == null) return;
+        playMode = settings.getMode();
+        friendPlayerCount = settings.getFriendPlayerCount();
+    }
+
     public void restart(String path) {
         System.out.println("Restarting game...");
 
@@ -1151,6 +1414,7 @@ public class GameScreen extends ScreenAdapter {
         wallsToDestroy.clear();
 
         tankObject = null;
+        disposeLocalPlayerJoysticks();
         shootPointer = -1;
         joystickPointer = -1;
 
@@ -1184,6 +1448,7 @@ public class GameScreen extends ScreenAdapter {
         }
 
         tankObject = null;
+        disposeLocalPlayerJoysticks();
         shootPointer = -1;
         joystickPointer = -1;
 
@@ -1226,13 +1491,13 @@ public class GameScreen extends ScreenAdapter {
             spawnEnemyIfPossible();
         }
 
-        playerSpawning = true;
-        Effect effect = new Effect(spawnFrames, tankSpawnMain, 0.23f, GameSettings.TANK_PIXEL_SIZE);
-        effect.isPlayerSpawn = true;
-        spawnEffects.add(effect);
+        spawnPlayersForCurrentMode();
 
-        liveView.setLeftLives(tankLives);
+        liveView.setLeftLives(isFriendsMode() ? friendPlayerCount : tankLives);
         tanksKilledText.setText("0 ");
+        if (isFriendsMode()) {
+            setupMultiplayerJoysticks();
+        }
     }
 
     @Override
@@ -1240,6 +1505,7 @@ public class GameScreen extends ScreenAdapter {
         if (map != null) map.dispose();
         if (renderer != null) renderer.dispose();
 
+        disposeLocalPlayerJoysticks();
         if (joystick != null) joystick.dispose();
         if (shootButton != null) shootButton.dispose();
         if (backgroundView != null) backgroundView.dispose();
