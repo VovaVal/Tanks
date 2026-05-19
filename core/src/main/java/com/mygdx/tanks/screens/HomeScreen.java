@@ -120,13 +120,11 @@ public class HomeScreen extends ScreenAdapter {
             titleW = titleH * titleAspect;
         }
 
-        // Подгоняем адаптивные размеры элементов управления под углы экрана
-        final float toggleW = Math.min(vw * 0.23f, 420f);
-        final float toggleH = Math.max(vh * 0.09f, 95f);
+        final float toggleW = Math.min(vw * 0.32f, 850f);
+        final float toggleH = Math.max(vh * 0.13f, 130f);
 
         final float dropdownW = Math.min(vw * 0.23f, 420f);
         final float dropdownH = Math.max(vh * 0.085f, 90f);
-        final float modeGap = vh * 0.018f;
 
         float modeBlockH = Math.max(toggleH, dropdownH);
         final float reservedTop = modeBlockH + marginY * 1.6f;
