@@ -1433,6 +1433,34 @@ public class GameScreen extends ScreenAdapter {
         }
 
         pauseBtnImg.draw(myGdxGame.batch);
+        if (pauseHoldTimer > 0f) {
+            myGdxGame.batch.end();
+
+            shapeRenderer.setProjectionMatrix(uiCamera.combined);
+
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+            shapeRenderer.begin(com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled);
+
+            float centerX = pauseBtnImg.x + pauseBtnImg.width / 2f;
+            float centerY = pauseBtnImg.y + pauseBtnImg.height / 2f;
+            float radius = Math.min(pauseBtnImg.width, pauseBtnImg.height) * 0.4f;
+
+            float progress = pauseHoldTimer / PAUSE_HOLD_DURATION;
+            float angle = progress * 360f;
+
+            shapeRenderer.setColor(0.2f, 0.2f, 0.2f, 0.5f);
+            shapeRenderer.arc(centerX, centerY, radius, 0, 360);
+
+            shapeRenderer.setColor(1f, 0.3f, 0.3f, 0.8f);
+            shapeRenderer.arc(centerX, centerY, radius, 90f, -angle);
+
+            shapeRenderer.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+
+            myGdxGame.batch.begin();
+        }
 
         if (gameSession.state == GameState.PAUSED) {
             fullBlackoutView.draw(myGdxGame.batch);
