@@ -143,6 +143,8 @@ public class GameScreen extends ScreenAdapter {
     private static final float MP_JOYSTICK_OUTER = 200f;
     private static final float MP_JOYSTICK_INNER = 130f;
     private static final float MP_JOYSTICK_Y = 240f;
+    private static final float MP_JOYSTICK_Y_BOTTOM = 200f;
+    private static final float MP_JOYSTICK_Y_TOP = GameSettings.UI_VIEWPORT_HEIGHT - 200f;
 
 
     public GameScreen(Tanks myGdxGame) {
@@ -376,22 +378,46 @@ public class GameScreen extends ScreenAdapter {
     private void setupMultiplayerJoysticks() {
         int n = localPlayers.size();
         float vw = GameSettings.UI_VIEWPORT_WIDTH;
-        float margin = vw * 0.08f;
-        float span = vw - 2f * margin;
+
+        // Отступы от краев экрана
+        float marginLeft = 220f;
+        float marginRight = vw - 220f;
 
         for (int i = 0; i < n; i++) {
             LocalPlayerSlot slot = localPlayers.get(i);
-            float centerX = margin + span * (i + 0.5f) / n;
+            float centerX = 0f;
+            float centerY = 0f;
+
+            // Распределяем джойстики по углам экрана
+            switch (i) {
+                case 0: // Игрок 1: Левый Нижний угол
+                    centerX = marginLeft;
+                    centerY = MP_JOYSTICK_Y_BOTTOM;
+                    break;
+                case 1: // Игрок 2: Правый Нижний угол
+                    centerX = marginRight;
+                    centerY = MP_JOYSTICK_Y_BOTTOM;
+                    break;
+                case 2: // Игрок 3: Левый Верхний угол
+                    centerX = marginLeft;
+                    centerY = MP_JOYSTICK_Y_TOP;
+                    break;
+                case 3: // Игрок 4: Правый Верхний угол
+                    centerX = marginRight;
+                    centerY = MP_JOYSTICK_Y_TOP;
+                    break;
+            }
+
             if (slot.joystick == null) {
                 slot.joystick = new VirtualJoystick(
                     uiViewport,
-                    centerX, MP_JOYSTICK_Y,
+                    centerX, centerY,
                     MP_JOYSTICK_OUTER, MP_JOYSTICK_INNER,
                     GameResources.BACKGROUND_CONTROLLER_IMG_PATH,
                     GameResources.CONTROLLER_IMG_PATH
                 );
             } else {
-                slot.joystick.setCenter(centerX, MP_JOYSTICK_Y);
+                slot.joystick.setCenter(centerX, centerY);
                 slot.joystick.setRadii(MP_JOYSTICK_OUTER, MP_JOYSTICK_INNER);
             }
         }
