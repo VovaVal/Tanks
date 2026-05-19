@@ -42,18 +42,28 @@ public class ModeToggleView extends View {
         float activeA = 1f;
         float inactiveA = 0.5f;
 
+        float padding = height * 0.3f;
         batch.setColor(0.12f, 0.12f, 0.16f, 0.85f);
-        batch.draw(texture, x - 6, y - 6, width + 12, height + 12);
+        batch.draw(texture, x - padding, y - padding, width + (padding * (float) 4.4), height + (padding * 2));
         batch.setColor(Color.WHITE);
+
+        float innerButtonW = width * 0.35f;
+        float gap = 15f;
+
+        float totalButtonsW = (innerButtonW * 2) + gap;
+        float startX = x + (width - totalButtonsW) * 0.5f;
+
+        float leftBtnX = startX;
+        float rightBtnX = startX + innerButtonW + gap;
 
         batch.setColor(1f, 1f, 1f, mode == GamePlayMode.SINGLE ? activeA : inactiveA);
-        batch.draw(texture, x, y, half, height);
+        batch.draw(texture, leftBtnX, y, half, height);
         batch.setColor(1f, 1f, 1f, mode == GamePlayMode.WITH_FRIENDS ? activeA : inactiveA);
-        batch.draw(texture, x + half, y, half, height);
+        batch.draw(texture, rightBtnX, y, half, height);
         batch.setColor(Color.WHITE);
 
-        drawLabel(batch, "Solo", x, half, mode == GamePlayMode.SINGLE);
-        drawLabel(batch, "Friends", x + half, half, mode == GamePlayMode.WITH_FRIENDS);
+        drawLabel(batch, "Solo", leftBtnX, half, mode == GamePlayMode.SINGLE);
+        drawLabel(batch, "Friends", rightBtnX, half, mode == GamePlayMode.WITH_FRIENDS);
     }
 
     private void drawLabel(SpriteBatch batch, String label, float segX, float segW, boolean active) {
