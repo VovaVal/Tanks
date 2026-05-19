@@ -1433,6 +1433,7 @@ public class GameScreen extends ScreenAdapter {
         }
 
         pauseBtnImg.draw(myGdxGame.batch);
+        // ОТРИСОВКА КРУГА ПРОГРЕССА ПАУЗЫ
         if (pauseHoldTimer > 0f) {
             myGdxGame.batch.end();
 
@@ -1441,7 +1442,7 @@ public class GameScreen extends ScreenAdapter {
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-            shapeRenderer.begin(com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
             float centerX = pauseBtnImg.x + pauseBtnImg.width / 2f;
             float centerY = pauseBtnImg.y + pauseBtnImg.height / 2f;
@@ -1450,11 +1451,14 @@ public class GameScreen extends ScreenAdapter {
             float progress = pauseHoldTimer / PAUSE_HOLD_DURATION;
             float angle = progress * 360f;
 
+            int segments = 40;
+
             shapeRenderer.setColor(0.2f, 0.2f, 0.2f, 0.5f);
-            shapeRenderer.arc(centerX, centerY, radius, 0, 360);
+            shapeRenderer.arc(centerX, centerY, radius, 0f, 360f, segments);
 
             shapeRenderer.setColor(1f, 0.3f, 0.3f, 0.8f);
-            shapeRenderer.arc(centerX, centerY, radius, 90f, -angle);
+
+            shapeRenderer.arc(centerX, centerY, radius, 90f, -angle, segments);
 
             shapeRenderer.end();
             Gdx.gl.glDisable(GL20.GL_BLEND);
