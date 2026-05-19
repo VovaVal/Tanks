@@ -169,13 +169,20 @@ public class HomeScreen extends ScreenAdapter {
     /** Блок режима — вверху по центру, крупный, отдельная полоса над контентом. */
     private void layoutModeControls(float vw, float vh, float marginY,
                                     float toggleW, float toggleH, float dropdownH, float modeGap) {
-        float panelX = (vw - toggleW) * 0.5f;
+
+        float dropdownW = 500f;
+        float totalW = toggleW + modeGap + dropdownW;
+
+        float startX = (vw - totalW) * 0.5f;
         float toggleY = vh - marginY - toggleH;
 
-        modeToggle.setBounds(panelX, toggleY, toggleW, toggleH);
+        modeToggle.setBounds(startX, toggleY, toggleW, toggleH);
 
         if (myGdxGame.menuPlaySettings.isWithFriends()) {
-            playerCountDropdown.setBounds(panelX, toggleY - modeGap - dropdownH, toggleW, dropdownH);
+            float dropdownX = startX + toggleW + modeGap;
+            float dropdownY = toggleY + (toggleH - dropdownH) * 0.6f;
+
+            playerCountDropdown.setBounds(dropdownX, dropdownY, dropdownW, dropdownH);
         }
     }
 
