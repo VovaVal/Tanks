@@ -49,9 +49,8 @@ public class PlayerCountDropdown extends View {
 
     public float getTotalHeight() {
         if (!expanded) return height;
-        // Заголовок + количество доступных опций выбора
         int optionsCount = MenuPlaySettings.MAX_FRIEND_PLAYERS - MenuPlaySettings.MIN_FRIEND_PLAYERS + 1;
-        return height * (1 + optionsCount);
+        return height * ((float) 2.25 + optionsCount);
     }
 
     @Override
