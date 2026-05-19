@@ -8,9 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.tanks.GamePlayMode;
 import com.mygdx.tanks.GameResources;
 
-/**
- * Переключатель «один / с друзьями» — два сегмента в одной полосе.
- */
 public class ModeToggleView extends View {
 
     private final Texture texture;
@@ -30,8 +27,6 @@ public class ModeToggleView extends View {
     public void setMode(GamePlayMode mode) {
         this.mode = mode;
     }
-
-    /** -1 — нет попадания; 0 — solo; 1 — friends */
     public int hitSegment(float tx, float ty) {
         if (!isHit(tx, ty)) return -1;
         float half = width * 0.5f;
@@ -57,8 +52,8 @@ public class ModeToggleView extends View {
         batch.draw(texture, x + half, y, half, height);
         batch.setColor(Color.WHITE);
 
-        drawLabel(batch, "Один", x, half, mode == GamePlayMode.SINGLE);
-        drawLabel(batch, "С друзьями", x + half, half, mode == GamePlayMode.WITH_FRIENDS);
+        drawLabel(batch, "Solo", x, half, mode == GamePlayMode.SINGLE);
+        drawLabel(batch, "Friends", x + half, half, mode == GamePlayMode.WITH_FRIENDS);
     }
 
     private void drawLabel(SpriteBatch batch, String label, float segX, float segW, boolean active) {
