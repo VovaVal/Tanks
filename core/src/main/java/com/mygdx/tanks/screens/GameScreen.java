@@ -402,7 +402,6 @@ public class GameScreen extends ScreenAdapter {
         int n = localPlayers.size();
         float vw = GameSettings.UI_VIEWPORT_WIDTH;
 
-        // Отступы от краев экрана
         float marginLeft = 220f;
         float marginRight = vw - 220f;
 
@@ -411,21 +410,24 @@ public class GameScreen extends ScreenAdapter {
             float centerX = 0f;
             float centerY = 0f;
 
-            // Распределяем джойстики по углам экрана
             switch (i) {
-                case 0: // Игрок 1: Левый Нижний угол
+                case 0:
                     centerX = marginLeft;
                     centerY = MP_JOYSTICK_Y_BOTTOM;
                     break;
-                case 1: // Игрок 2: Правый Нижний угол
+                case 1:
                     centerX = marginRight;
-                    centerY = MP_JOYSTICK_Y_BOTTOM;
+                    if (n == 2) {
+                        centerY = MP_JOYSTICK_Y_TOP;
+                    } else {
+                        centerY = MP_JOYSTICK_Y_BOTTOM;
+                    }
                     break;
-                case 2: // Игрок 3: Левый Верхний угол
+                case 2:
                     centerX = marginLeft;
                     centerY = MP_JOYSTICK_Y_TOP;
                     break;
-                case 3: // Игрок 4: Правый Верхний угол
+                case 3:
                     centerX = marginRight;
                     centerY = MP_JOYSTICK_Y_TOP;
                     break;
