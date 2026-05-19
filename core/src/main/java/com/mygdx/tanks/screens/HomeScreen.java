@@ -83,16 +83,16 @@ public class HomeScreen extends ScreenAdapter {
         modeToggle = new ModeToggleView(myGdxGame.largeWhiteFont);
         modeToggle.setMode(myGdxGame.menuPlaySettings.getMode());
 
+        // ПРИМЕЧАНИЕ: Если ваш ModeToggleView поддерживает изменение текста динамически,
+        // вы можете раскомментировать или добавить метод инициализации строк ниже:
+        // modeToggle.setLabels("Соло", "Друг");
+
         playerCountDropdown = new PlayerCountDropdown(myGdxGame.largeWhiteFont);
         playerCountDropdown.setSelectedCount(myGdxGame.menuPlaySettings.getFriendPlayerCount());
 
         layoutMenu();
     }
 
-    /**
-     * Раскладка меню в координатах виртуального холста: отступы и размеры как доли ширины/высоты,
-     * блок (заголовок + сетка уровней) центрируется по вертикали и горизонтали.
-     */
     private void layoutMenu() {
         final float vw = GameSettings.UI_VIEWPORT_WIDTH;
         final float vh = GameSettings.UI_VIEWPORT_HEIGHT;
@@ -120,21 +120,22 @@ public class HomeScreen extends ScreenAdapter {
             titleW = titleH * titleAspect;
         }
 
-        final float toggleW = Math.min(vw * 0.72f, 1100f);
-        final float toggleH = Math.max(vh * 0.1f, 110f);
-        final float dropdownH = Math.max(vh * 0.085f, 95f);
+        // Подгоняем адаптивные размеры элементов управления под углы экрана
+        final float toggleW = Math.min(vw * 0.23f, 420f);
+        final float toggleH = Math.max(vh * 0.09f, 95f);
+
+        final float dropdownW = Math.min(vw * 0.23f, 420f);
+        final float dropdownH = Math.max(vh * 0.085f, 90f);
         final float modeGap = vh * 0.018f;
-        float modeBlockH = toggleH;
-        if (myGdxGame.menuPlaySettings.isWithFriends()) {
-            modeBlockH += modeGap + dropdownH;
-        }
+
+        float modeBlockH = Math.max(toggleH, dropdownH);
         final float reservedTop = modeBlockH + marginY * 1.6f;
 
         float contentH = titleH + titleGap + gridH;
         float availH = vh - reservedTop - marginY;
         float rowBottomY = Math.max(marginY, marginY + (availH - contentH) * 0.5f);
         float rowTopY = rowBottomY + buttonH + rowGap;
-        // Опускаем логотип ближе к верхнему ряду кнопок (не меняем contentH — лёгкое перекрытие по вертикали)
+
         final float logoDownShift = vh * 0.055f;
         float titleY = rowTopY + buttonH + titleGap - logoDownShift;
         float titleX = (vw - titleW) * 0.5f;
@@ -158,38 +159,34 @@ public class HomeScreen extends ScreenAdapter {
             int level = 4 + i;
             ButtonView btn = level <= 5 ? topRow[level - 1] : bottomRow[level - 6];
             float cx = btn.x + btn.width * 0.5f - chainW * 0.5f;
-            // Ниже по кнопке (раньше цепь «висела» слишком высоко над центром)
             float cy = btn.y + btn.height * 0.62f - chainH * 0.55f;
             chains[i].setBounds(cx, cy, chainW, chainH);
         }
 
-        layoutModeControls(vw, vh, marginY, toggleW, toggleH, dropdownH, modeGap);
+        // Вызываем обновленный метод позиционирования по разным сторонам
+        layoutModeControlsInCorners(vw, vh, marginY, toggleW, toggleH, dropdownW, dropdownH);
     }
 
-    /** Блок режима — вверху по центру, крупный, отдельная полоса над контентом. */
-    private void layoutModeControls(float vw, float vh, float marginY,
-                                    float toggleW, float toggleH, float dropdownH, float modeGap) {
+    /** Разносит элементы управления: Тип игры — СЛЕВА, Количество игроков — СПРАВА */
+    private void layoutModeControlsInCorners(float vw, float vh, float marginY,
+                                             float toggleW, float toggleH, float dropdownW, float dropdownH) {
 
-        float dropdownW = 500f;
-        float totalW = toggleW + modeGap + dropdownW;
-
-        float startX = (vw - totalW) * 0.5f;
+        // 1. Кнопки выбора типа игры уходят строго влево
+        float leftX = vw * 0.04f;
         float toggleY = vh - marginY - toggleH;
+        modeToggle.setBounds(leftX, toggleY, toggleW, toggleH);
 
-        modeToggle.setBounds(startX, toggleY, toggleW, toggleH);
-
+        // 2. Выпадающий список количества игроков уходит строго вправо
         if (myGdxGame.menuPlaySettings.isWithFriends()) {
-            float dropdownX = startX + toggleW + modeGap;
-            float dropdownY = toggleY + (toggleH - dropdownH) * 0.6f;
-
-            playerCountDropdown.setBounds(dropdownX, dropdownY, dropdownW, dropdownH);
+            float rightX = vw - (vw * 0.04f) - dropdownW;
+            float dropdownY = vh - marginY - dropdownH;
+            playerCountDropdown.setBounds(rightX, dropdownY, dropdownW, dropdownH);
         }
     }
 
     @Override
     public void render(float delta) {
         handleInput();
-
         draw();
     }
 
@@ -262,6 +259,10 @@ public class HomeScreen extends ScreenAdapter {
     }
 
     private void startLevel(String mapPath) {
+        if (playerCountDropdown != null) {
+            playerCountDropdown.setExpanded(false);
+        }
+
         syncMenuSettingsFromUi();
         gameScreen.applyMenuSettings(myGdxGame.menuPlaySettings);
         myGdxGame.audioManager.btnClick.play();
