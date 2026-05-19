@@ -11,6 +11,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -54,6 +55,11 @@ public class GameScreen extends ScreenAdapter {
     VirtualJoystick joystick;
     GameSession gameSession;
     ContactManager contactManager;
+
+    ShapeRenderer shapeRenderer;
+    private float pauseHoldTimer = 0f;
+    private static final float PAUSE_HOLD_DURATION = 3.0f;
+    private int pausePointer = -1;
 
     ButtonView shootButton;
     BackgroundView backgroundView;
@@ -156,6 +162,8 @@ public class GameScreen extends ScreenAdapter {
         contactManager = new ContactManager(myGdxGame.world, this, myGdxGame.audioManager, gameSession);
 
         backgroundView = new BackgroundView(GameResources.BACKGROUND_GAME_IMG_PATH);
+
+        shapeRenderer = new ShapeRenderer();
 
         map = new TmxMapLoader().load("maps/map_1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map);
@@ -338,6 +346,15 @@ public class GameScreen extends ScreenAdapter {
             effect.playerSpawnSlot = -1;
             spawnEffects.add(effect);
             tankLives = 3;
+
+            final float pauseW = 280f;
+            final float pauseH = 220f;
+            final float pauseMarginTop = 20f;
+
+            pauseBtnImg.width = pauseW;
+            pauseBtnImg.height = pauseH;
+            pauseBtnImg.x = 0f;
+            pauseBtnImg.y = GameSettings.UI_VIEWPORT_HEIGHT - pauseH - pauseMarginTop;
         }
     }
 
@@ -758,6 +775,36 @@ public class GameScreen extends ScreenAdapter {
             trySpawnRandomBonus();
         }
 
+        if (gameSession.state == GameState.PLAYING) {
+            if (pausePointer != -1) {
+                if (Gdx.input.isTouched(pausePointer)) {
+                    Vector3 touchPos = new Vector3(Gdx.input.getX(pausePointer), Gdx.input.getY(pausePointer), 0);
+                    uiViewport.getCamera().unproject(touchPos);
+
+                    if (touchPos.x >= pauseBtnImg.x && touchPos.x <= (pauseBtnImg.x + pauseBtnImg.width) &&
+                        touchPos.y >= pauseBtnImg.y && touchPos.y <= (pauseBtnImg.y + pauseBtnImg.height)) {
+
+                        pauseHoldTimer += delta;
+
+                        if (pauseHoldTimer >= PAUSE_HOLD_DURATION) {
+                            pauseHoldTimer = 0f;
+                            pausePointer = -1;
+                            gameSession.pauseGame();
+                        }
+                    } else {
+                        pauseHoldTimer = 0f;
+                        pausePointer = -1;
+                    }
+                } else {
+                    pauseHoldTimer = 0f;
+                    pausePointer = -1;
+                }
+            }
+        } else {
+            pauseHoldTimer = 0f;
+            pausePointer = -1;
+        }
+
         updateSpawnEffects(Gdx.graphics.getDeltaTime());
         updateDeathEffects(Gdx.graphics.getDeltaTime());
         if (!isFriendsMode()) {
@@ -1026,9 +1073,18 @@ public class GameScreen extends ScreenAdapter {
 
                 switch (gameSession.state) {
                     case PLAYING:
-                        if (pauseBtnImg.isHit(touchPos.x, touchPos.y)) {
-                            myGdxGame.audioManager.btnClick.play();
-                            gameSession.pauseGame();
+//                        if (pauseBtnImg.isHit(touchPos.x, touchPos.y)) {
+//                            myGdxGame.audioManager.btnClick.play();
+//                            gameSession.pauseGame();
+//                        }
+
+                        if (touchPos.x >= pauseBtnImg.x && touchPos.x <= (pauseBtnImg.x + pauseBtnImg.width) &&
+                            touchPos.y >= pauseBtnImg.y && touchPos.y <= (pauseBtnImg.y + pauseBtnImg.height)) {
+
+                            if (pausePointer == -1) {
+                                pausePointer = i;
+                                pauseHoldTimer = 0f;
+                            }
                         }
 
                         if (!isFriendsMode()) {
@@ -1549,6 +1605,7 @@ public class GameScreen extends ScreenAdapter {
         if (pauseBtnImg != null) pauseBtnImg.dispose();
         if (enemyTankImg != null) enemyTankImg.dispose();
         if (fullBlackoutView != null) fullBlackoutView.dispose();
+        if (shapeRenderer != null) shapeRenderer.dispose();
 
         for (Texture tex : spawnFrames) {
             if (tex != null) tex.dispose();
