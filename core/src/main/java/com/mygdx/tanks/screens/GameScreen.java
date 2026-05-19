@@ -211,6 +211,7 @@ public class GameScreen extends ScreenAdapter {
         final float pauseW = 280f;
         final float pauseH = 220f;
         final float pauseMarginTop = 20f;
+
         pauseBtnImg = new ImageView(
             0f,
             GameSettings.UI_VIEWPORT_HEIGHT - pauseH - pauseMarginTop,
@@ -313,6 +314,11 @@ public class GameScreen extends ScreenAdapter {
             playerDead = false;
             playerSpawning = true;
             tankLives = friendPlayerCount;
+
+            pauseBtnImg.width = 170;
+            pauseBtnImg.height = 150;
+            pauseBtnImg.x = GameSettings.UI_VIEWPORT_WIDTH - pauseBtnImg.width;
+            pauseBtnImg.y = (GameSettings.UI_VIEWPORT_HEIGHT - pauseBtnImg.height) / 2f;
 
             for (int i = 0; i < friendPlayerCount; i++) {
                 localPlayers.add(new LocalPlayerSlot(i));
@@ -1362,10 +1368,14 @@ public class GameScreen extends ScreenAdapter {
             joystick.draw(myGdxGame.batch);
             shootButton.draw(myGdxGame.batch);
         }
-        liveView.draw(myGdxGame.batch);
-        tanksKilledText.draw(myGdxGame.batch);
-        tanksAllText.draw(myGdxGame.batch);
-        enemyTankImg.draw(myGdxGame.batch);
+
+        if (!isFriendsMode()) {
+            liveView.draw(myGdxGame.batch);
+            tanksKilledText.draw(myGdxGame.batch);
+            tanksAllText.draw(myGdxGame.batch);
+            enemyTankImg.draw(myGdxGame.batch);
+        }
+
         pauseBtnImg.draw(myGdxGame.batch);
 
         if (gameSession.state == GameState.PAUSED) {

@@ -21,6 +21,14 @@ public class ImageView extends View {
         this.height = height;
     }
 
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
     @Override
     public void draw(SpriteBatch batch) {
         batch.draw(texture, x, y, width, height);
@@ -30,6 +38,4 @@ public class ImageView extends View {
     public void dispose() {
         texture.dispose();
     }
-
-
 }
