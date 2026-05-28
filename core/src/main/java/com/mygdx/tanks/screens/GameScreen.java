@@ -278,13 +278,17 @@ public class GameScreen extends ScreenAdapter {
 
         liveView = new LiveView(0, 0);
 
-        for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
-            spawnEnemyIfPossible();
+        if (!isFriendsMode()) {
+            for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
+                spawnEnemyIfPossible();
+            }
+            enemiesSpawned = 4;
+        } else {
+            enemiesSpawned = 0;
         }
 
         spawnPlayersForCurrentMode();
 
-        enemiesSpawned = 4;
         enemiesKilled = 0;
 
         liveView.setLeftLives(tankLives);
@@ -643,6 +647,8 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void spawnEnemyIfPossible() {
+        if (isFriendsMode()) return;
+
         if (enemiesSpawned >= TOTAL_ENEMIES) return;
         if (tanks.size() + spawnEffects.size() >= MAX_ENEMIES_ON_MAP) return;
 
@@ -819,12 +825,19 @@ public class GameScreen extends ScreenAdapter {
             gameSession.state = GameState.ENDED;
             playerWin = false;
         }
-        if (isFriendsMode() && countAliveLocalPlayers() == 0 && !playerSpawning) {
-            gameSession.state = GameState.ENDED;
-            playerWin = false;
+
+        if (isFriendsMode() && !playerSpawning) {
+            int alivePlayers = countAliveLocalPlayers();
+
+            if (alivePlayers <= 1) {
+                gameSession.state = GameState.ENDED;
+                playerWin = true;
+            }
         }
+
         if (drawFlag && timeToDie < TimeUtils.millis()) gameSession.state = GameState.ENDED;
-        if (enemiesKilled >= TOTAL_ENEMIES){
+
+        if (!isFriendsMode() && enemiesKilled >= TOTAL_ENEMIES){
             gameSession.state = GameState.ENDED;
             playerWin = true;
 
@@ -1613,8 +1626,10 @@ public class GameScreen extends ScreenAdapter {
 
         createWorldBounds();
 
-        for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
-            spawnEnemyIfPossible();
+        if (!isFriendsMode()) {
+            for (int i = 0; i < MAX_ENEMIES_ON_MAP; i++) {
+                spawnEnemyIfPossible();
+            }
         }
 
         spawnPlayersForCurrentMode();
