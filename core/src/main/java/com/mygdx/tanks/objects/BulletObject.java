@@ -9,6 +9,7 @@ public class BulletObject extends GameObject {
     public boolean wasHit;
     public int angleDeg;
     private boolean enemyBullet;
+    private TankObject owner;
 
     public BulletObject(float x, float y, int width, int height, String texturePath, World world, Vector2 direction, TankObject tankObject, Boolean enemyBullet) {
         super(texturePath, x, y, width, height, GameSettings.BULLET_BIT, world, "bullet");
@@ -21,6 +22,7 @@ public class BulletObject extends GameObject {
 
         this.angleDeg = tankObject.angleDeg - 90;
         this.enemyBullet = enemyBullet;
+        this.owner = tankObject;
 
         wasHit = false;
     }
@@ -41,9 +43,14 @@ public class BulletObject extends GameObject {
     public boolean isHit() {
         return wasHit;
     }
+
     @Override
     public void hit() {
         wasHit = true;
+    }
+
+    public TankObject getOwner() {
+        return owner;
     }
 
     @Override

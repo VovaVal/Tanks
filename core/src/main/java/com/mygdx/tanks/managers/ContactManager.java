@@ -102,7 +102,7 @@ public class ContactManager {
                     bullet.hit();
 
                     if (gameScreen.isFriendsMode()) {
-                        if (!tank.isEnemy()) {
+                        if (!tank.isEnemy() && bullet.getOwner() != tank) {
                             tank.hit();
 
                             if (!tank.isAlive()) {
