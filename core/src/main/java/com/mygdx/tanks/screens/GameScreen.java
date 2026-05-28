@@ -363,7 +363,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private Vector2 getMultiplayerSpawnPosition(int index, int total) {
-        float offset = GameSettings.TILE_SIZE * 1.5f;
+        float offset = GameSettings.TILE_SIZE * 2.5f;
 
         float minX = offset;
         float maxX = GameSettings.MAP_WIDTH - offset;
