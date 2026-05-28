@@ -414,8 +414,8 @@ public class GameScreen extends ScreenAdapter {
         int n = localPlayers.size();
         float vw = GameSettings.UI_VIEWPORT_WIDTH;
 
-        float marginLeft = 400;
-        float marginRight = vw - 400;
+        float marginLeft = 360;
+        float marginRight = vw - 360;
 
         for (int i = 0; i < n; i++) {
             LocalPlayerSlot slot = localPlayers.get(i);
