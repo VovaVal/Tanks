@@ -363,25 +363,25 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private Vector2 getMultiplayerSpawnPosition(int index, int total) {
-        Vector2 base = tankSpawnMain.cpy();
-        float d = GameSettings.TILE_SIZE * 1.4f;
-        switch (total) {
+        float offset = GameSettings.TILE_SIZE * 1.5f;
+
+        float minX = offset;
+        float maxX = GameSettings.MAP_WIDTH - offset;
+        float minY = offset;
+        float maxY = GameSettings.MAP_HEIGHT - offset;
+
+        switch (index) {
+            case 0:
+                return new Vector2(minX, minY);
+            case 1:
+                return new Vector2(maxX, maxY);
             case 2:
-                base.add(index == 0 ? -d : d, 0);
-                break;
+                return new Vector2(minX, maxY);
             case 3:
-                if (index == 0) base.add(-d, 0);
-                else if (index == 1) base.add(0, d);
-                else base.add(d, 0);
-                break;
+                return new Vector2(maxX, minY);
             default:
-                if (index == 0) base.add(-d, d);
-                else if (index == 1) base.add(d, d);
-                else if (index == 2) base.add(-d, -d);
-                else base.add(d, -d);
-                break;
+                return tankSpawnMain.cpy();
         }
-        return base;
     }
 
     private void spawnTankForSlot(int slotIndex, Vector2 position) {
