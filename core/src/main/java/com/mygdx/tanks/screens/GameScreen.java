@@ -385,12 +385,20 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void spawnTankForSlot(int slotIndex, Vector2 position) {
+        String texturePath;
+        switch (slotIndex) {
+            case 1:  texturePath = GameResources.TANK_GREY_IMG_PATH; break;
+            case 2:  texturePath = GameResources.TANK_RED_IMG_PATH; break;
+            case 3:  texturePath = GameResources.TANK_GREEN_IMG_PATH; break;
+            default: texturePath = GameResources.TANK_IMG_PATH; break;
+        }
+
         TankObject playerTank = new TankObject(
             (int) position.x,
             (int) position.y,
             GameSettings.TANK_PIXEL_SIZE,
             GameSettings.TANK_PIXEL_SIZE,
-            GameResources.TANK_IMG_PATH,
+            texturePath,
             myGdxGame.world,
             false,
             1
@@ -438,12 +446,20 @@ public class GameScreen extends ScreenAdapter {
             }
 
             if (slot.joystick == null) {
+                String knobTexture;
+                switch (i) {
+                    case 1:  knobTexture = GameResources.CONTROLLER_IMG_PATH; break;
+                    case 2:  knobTexture = GameResources.CONTROLLER_RED_IMG_PATH; break;
+                    case 3:  knobTexture = GameResources.CONTROLLER_GREEN_IMG_PATH; break;
+                    default: knobTexture = GameResources.CONTROLLER_YELLOW_IMG_PATH; break;
+                }
+
                 slot.joystick = new VirtualJoystick(
                     uiViewport,
                     centerX, centerY,
                     MP_JOYSTICK_OUTER, MP_JOYSTICK_INNER,
                     GameResources.BACKGROUND_CONTROLLER_IMG_PATH,
-                    GameResources.CONTROLLER_IMG_PATH
+                    knobTexture // Применяем цвет
                 );
             } else {
                 slot.joystick.setCenter(centerX, centerY);
