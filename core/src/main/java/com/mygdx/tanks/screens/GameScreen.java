@@ -414,8 +414,8 @@ public class GameScreen extends ScreenAdapter {
         int n = localPlayers.size();
         float vw = GameSettings.UI_VIEWPORT_WIDTH;
 
-        float marginLeft = 220f;
-        float marginRight = vw - 220f;
+        float marginLeft = 400;
+        float marginRight = vw - 400;
 
         for (int i = 0; i < n; i++) {
             LocalPlayerSlot slot = localPlayers.get(i);
@@ -425,23 +425,23 @@ public class GameScreen extends ScreenAdapter {
             switch (i) {
                 case 0:
                     centerX = marginLeft;
-                    centerY = MP_JOYSTICK_Y_BOTTOM;
+                    centerY = MP_JOYSTICK_Y_BOTTOM + 80;
                     break;
                 case 1:
                     centerX = marginRight;
                     if (n == 2) {
-                        centerY = MP_JOYSTICK_Y_TOP;
+                        centerY = MP_JOYSTICK_Y_TOP - 80;
                     } else {
-                        centerY = MP_JOYSTICK_Y_BOTTOM;
+                        centerY = MP_JOYSTICK_Y_BOTTOM + 80;
                     }
                     break;
                 case 2:
                     centerX = marginLeft;
-                    centerY = MP_JOYSTICK_Y_TOP;
+                    centerY = MP_JOYSTICK_Y_TOP - 80;
                     break;
                 case 3:
                     centerX = marginRight;
-                    centerY = MP_JOYSTICK_Y_TOP;
+                    centerY = MP_JOYSTICK_Y_TOP - 80;
                     break;
             }
 
@@ -457,13 +457,13 @@ public class GameScreen extends ScreenAdapter {
                 slot.joystick = new VirtualJoystick(
                     uiViewport,
                     centerX, centerY,
-                    MP_JOYSTICK_OUTER, MP_JOYSTICK_INNER,
+                    280, 182,
                     GameResources.BACKGROUND_CONTROLLER_IMG_PATH,
-                    knobTexture // Применяем цвет
+                    knobTexture
                 );
             } else {
                 slot.joystick.setCenter(centerX, centerY);
-                slot.joystick.setRadii(MP_JOYSTICK_OUTER, MP_JOYSTICK_INNER);
+                slot.joystick.setRadii(280, 182);
             }
         }
     }
