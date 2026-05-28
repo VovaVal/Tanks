@@ -83,10 +83,6 @@ public class HomeScreen extends ScreenAdapter {
         modeToggle = new ModeToggleView(myGdxGame.largeWhiteFont);
         modeToggle.setMode(myGdxGame.menuPlaySettings.getMode());
 
-        // ПРИМЕЧАНИЕ: Если ваш ModeToggleView поддерживает изменение текста динамически,
-        // вы можете раскомментировать или добавить метод инициализации строк ниже:
-        // modeToggle.setLabels("Соло", "Друг");
-
         playerCountDropdown = new PlayerCountDropdown(myGdxGame.largeWhiteFont);
         playerCountDropdown.setSelectedCount(myGdxGame.menuPlaySettings.getFriendPlayerCount());
 
@@ -161,20 +157,15 @@ public class HomeScreen extends ScreenAdapter {
             chains[i].setBounds(cx, cy, chainW, chainH);
         }
 
-        // Вызываем обновленный метод позиционирования по разным сторонам
         layoutModeControlsInCorners(vw, vh, marginY, toggleW, toggleH, dropdownW, dropdownH);
     }
 
-    /** Разносит элементы управления: Тип игры — СЛЕВА, Количество игроков — СПРАВА */
     private void layoutModeControlsInCorners(float vw, float vh, float marginY,
                                              float toggleW, float toggleH, float dropdownW, float dropdownH) {
-
-        // 1. Кнопки выбора типа игры уходят строго влево
         float leftX = vw * 0.04f;
         float toggleY = vh - marginY - toggleH;
         modeToggle.setBounds(leftX, toggleY, toggleW, toggleH);
 
-        // 2. Выпадающий список количества игроков уходит строго вправо
         if (myGdxGame.menuPlaySettings.isWithFriends()) {
             float rightX = vw - (vw * 0.04f) - dropdownW;
             float dropdownY = vh - marginY - dropdownH;
@@ -204,25 +195,27 @@ public class HomeScreen extends ScreenAdapter {
             return;
         }
 
+        boolean isWithFriends = myGdxGame.menuPlaySettings.isWithFriends();
+
         if (level1.isHit(touchPos.x, touchPos.y)) {
             startLevel("maps/map_1.tmx");
         } else if (level2.isHit(touchPos.x, touchPos.y)) {
             startLevel("maps/map_2.tmx");
         } else if (level3.isHit(touchPos.x, touchPos.y)) {
             startLevel("maps/map_3.tmx");
-        } else if (level4.isHit(touchPos.x, touchPos.y) && 4 <= MemoryManager.getMaxLevel()) {
+        } else if (level4.isHit(touchPos.x, touchPos.y) && (isWithFriends || 4 <= MemoryManager.getMaxLevel())) {
             startLevel("maps/map_4.tmx");
-        } else if (level5.isHit(touchPos.x, touchPos.y) && 5 <= MemoryManager.getMaxLevel()) {
+        } else if (level5.isHit(touchPos.x, touchPos.y) && (isWithFriends || 5 <= MemoryManager.getMaxLevel())) {
             startLevel("maps/map_5.tmx");
-        } else if (level6.isHit(touchPos.x, touchPos.y) && 6 <= MemoryManager.getMaxLevel()) {
+        } else if (level6.isHit(touchPos.x, touchPos.y) && (isWithFriends || 6 <= MemoryManager.getMaxLevel())) {
             startLevel("maps/map_6.tmx");
-        } else if (level7.isHit(touchPos.x, touchPos.y) && 7 <= MemoryManager.getMaxLevel()) {
+        } else if (level7.isHit(touchPos.x, touchPos.y) && (isWithFriends || 7 <= MemoryManager.getMaxLevel())) {
             startLevel("maps/map_7.tmx");
-        } else if (level8.isHit(touchPos.x, touchPos.y) && 8 <= MemoryManager.getMaxLevel()) {
+        } else if (level8.isHit(touchPos.x, touchPos.y) && (isWithFriends || 8 <= MemoryManager.getMaxLevel())) {
             startLevel("maps/map_8.tmx");
-        } else if (level9.isHit(touchPos.x, touchPos.y) && 9 <= MemoryManager.getMaxLevel()) {
+        } else if (level9.isHit(touchPos.x, touchPos.y) && (isWithFriends || 9 <= MemoryManager.getMaxLevel())) {
             startLevel("maps/map_9.tmx");
-        } else if (level10.isHit(touchPos.x, touchPos.y) && 10 <= MemoryManager.getMaxLevel()) {
+        } else if (level10.isHit(touchPos.x, touchPos.y) && (isWithFriends || 10 <= MemoryManager.getMaxLevel())) {
             startLevel("maps/map_10.tmx");
         }
     }
@@ -298,13 +291,16 @@ public class HomeScreen extends ScreenAdapter {
 
         tanksText.draw(myGdxGame.batch);
 
-        if(!(4 <= MemoryManager.getMaxLevel())) chains4.draw(myGdxGame.batch);
-        if(!(5 <= MemoryManager.getMaxLevel())) chains5.draw(myGdxGame.batch);
-        if(!(6 <= MemoryManager.getMaxLevel())) chains6.draw(myGdxGame.batch);
-        if(!(7 <= MemoryManager.getMaxLevel())) chains7.draw(myGdxGame.batch);
-        if(!(8 <= MemoryManager.getMaxLevel())) chains8.draw(myGdxGame.batch);
-        if(!(9 <= MemoryManager.getMaxLevel())) chains9.draw(myGdxGame.batch);
-        if(!(10 <= MemoryManager.getMaxLevel())) chains10.draw(myGdxGame.batch);
+        boolean isWithFriends = myGdxGame.menuPlaySettings.isWithFriends();
+        if (!isWithFriends) {
+            if (!(4 <= MemoryManager.getMaxLevel())) chains4.draw(myGdxGame.batch);
+            if (!(5 <= MemoryManager.getMaxLevel())) chains5.draw(myGdxGame.batch);
+            if (!(6 <= MemoryManager.getMaxLevel())) chains6.draw(myGdxGame.batch);
+            if (!(7 <= MemoryManager.getMaxLevel())) chains7.draw(myGdxGame.batch);
+            if (!(8 <= MemoryManager.getMaxLevel())) chains8.draw(myGdxGame.batch);
+            if (!(9 <= MemoryManager.getMaxLevel())) chains9.draw(myGdxGame.batch);
+            if (!(10 <= MemoryManager.getMaxLevel())) chains10.draw(myGdxGame.batch);
+        }
 
         if (modeToggle != null) {
             modeToggle.draw(myGdxGame.batch);
