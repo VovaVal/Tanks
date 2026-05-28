@@ -603,6 +603,9 @@ public class GameScreen extends ScreenAdapter {
                             type = GameSettings.TILE_WATER;
                             break;
                         case "4":
+                            if (isFriendsMode()) {
+                                continue;
+                            }
                             System.out.println("Eagle");
                             type = GameSettings.TILE_EAGLE;
                             break;
