@@ -65,7 +65,6 @@ public class VirtualJoystick {
         update(null);
     }
 
-    /** @param blockedPointers пальцы, уже заняты другими джойстиками */
     public void update(IntArray blockedPointers) {
         if (activePointer == -1) {
             for (int i = 0; i < Gdx.input.getMaxPointers(); i++) {

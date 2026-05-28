@@ -6,8 +6,14 @@ public class GameResources {
     public static final String LIVE_IMG_PATH = "textures_imgs/life.png";
 
     public static final String CONTROLLER_IMG_PATH = "textures_imgs/LargeHandleFilledGrey.png";
+    public static final String CONTROLLER_RED_IMG_PATH = "textures_imgs/red_joystick.png";
+    public static final String CONTROLLER_YELLOW_IMG_PATH = "textures_imgs/yellow_joystick.png";
+    public static final String CONTROLLER_GREEN_IMG_PATH = "textures_imgs/green_joystick.png";
     public static final String BACKGROUND_CONTROLLER_IMG_PATH = "textures_imgs/Joystick.png";
     public static final String TANK_IMG_PATH = "textures_imgs/1_1.png";
+    public static final String TANK_GREY_IMG_PATH = "textures_imgs/2_1.png";
+    public static final String TANK_RED_IMG_PATH = "textures_imgs/3_1.png";
+    public static final String TANK_GREEN_IMG_PATH = "textures_imgs/4_1.png";
     public static final String ENEMY_TANK_IMG_PATH = "textures_imgs/enemy_tank.png";
     public static final String SHOOT_BTN_IMG_PATH = "textures_imgs/shoot_btn.png";
     public static final String BULLET_IMG_PATH = "textures_imgs/bullet.png";
