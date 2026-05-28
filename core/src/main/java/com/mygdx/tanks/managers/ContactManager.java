@@ -101,20 +101,29 @@ public class ContactManager {
 
                     bullet.hit();
 
-                    if (bullet.isEnemyBullet() && !tank.isEnemy()) {
-                        tank.hit();
+                    if (gameScreen.isFriendsMode()) {
+                        if (!tank.isEnemy()) {
+                            tank.hit();
 
-                        if (!tank.isAlive()) {
-                            audioManager.tankDiedMain.play();
-                            tank.setDestroyed(true);
-                            if (gameScreen.isFriendsMode()) {
+                            if (!tank.isAlive()) {
+                                audioManager.tankDiedMain.play();
+                                tank.setDestroyed(true);
                                 gameScreen.onFriendsPlayerTankLost();
-                            } else {
-                                gameScreen.tankLives--;
                             }
                         }
-                    } else if (!bullet.isEnemyBullet() && tank.isEnemy()) {
-                        tank.hit();
+                    }
+                    else {
+                        if (bullet.isEnemyBullet() && !tank.isEnemy()) {
+                            tank.hit();
+
+                            if (!tank.isAlive()) {
+                                audioManager.tankDiedMain.play();
+                                tank.setDestroyed(true);
+                                gameScreen.tankLives--;
+                            }
+                        } else if (!bullet.isEnemyBullet() && tank.isEnemy()) {
+                            tank.hit();
+                        }
                     }
                 } else if ((objA instanceof BulletObject && "WORLD_BOUND".equals(objB)) ||
                     ("WORLD_BOUND".equals(objA) && objB instanceof BulletObject)) {
