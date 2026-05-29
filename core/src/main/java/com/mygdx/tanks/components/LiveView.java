@@ -24,7 +24,6 @@ public class LiveView extends View {
         this.leftLives = leftLives;
     }
 
-    /** Ширина трёх сердец в ряд с промежутками (как при отрисовке 3 жизней). */
     public float getHeartsClusterWidth() {
         return 3f * width + 2f * (float) livePadding;
     }
@@ -40,6 +39,4 @@ public class LiveView extends View {
     public void dispose() {
         texture.dispose();
     }
-
-
 }

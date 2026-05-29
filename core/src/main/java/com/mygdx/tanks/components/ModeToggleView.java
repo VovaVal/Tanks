@@ -27,6 +27,7 @@ public class ModeToggleView extends View {
     public void setMode(GamePlayMode mode) {
         this.mode = mode;
     }
+
     public int hitSegment(float tx, float ty) {
         if (!isHit(tx, ty)) return -1;
         float half = width * 0.5f;

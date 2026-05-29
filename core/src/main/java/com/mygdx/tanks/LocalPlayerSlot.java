@@ -3,7 +3,6 @@ package com.mygdx.tanks;
 import com.mygdx.tanks.components.VirtualJoystick;
 import com.mygdx.tanks.objects.TankObject;
 
-/** Локальный игрок в режиме «с друзьями». */
 public class LocalPlayerSlot {
 
     public final int index;

@@ -55,7 +55,6 @@ public class ButtonView extends View {
         texture = new Texture(texturePath);
     }
 
-    /** Переставляет кнопку и заново центрирует подпись (для адаптивного меню). */
     public void setLayoutBounds(float x, float y, float width, float height) {
         super.setBounds(x, y, width, height);
         this.x = x;

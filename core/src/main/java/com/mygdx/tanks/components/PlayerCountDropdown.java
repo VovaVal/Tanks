@@ -8,10 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.tanks.GameResources;
 import com.mygdx.tanks.MenuPlaySettings;
 
-/**
- * Выпадающий список числа игроков (2–4) для режима «с друзьями».
- * Раскрывается сверху вниз.
- */
 public class PlayerCountDropdown extends View {
 
     private final Texture texture;
@@ -55,14 +51,12 @@ public class PlayerCountDropdown extends View {
 
     @Override
     public boolean isHit(float tx, float ty) {
-        // Так как шторка идет ВНИЗ, общая зона клика теперь простирается от (y - общей_высоты + высота_шапки) до (y + высота_шапки)
         float totalH = getTotalHeight();
         float minY = (y + height) - totalH;
         float maxY = y + height;
         return tx >= x && tx <= x + width && ty >= minY && ty <= maxY;
     }
 
-    /** Клик по заголовку (свернуть/развернуть): 0. По пункту: 2, 3 или 4. Иначе -1. */
     public int handleTouch(float tx, float ty) {
         if (!isHit(tx, ty)) return -1;
 
@@ -77,8 +71,6 @@ public class PlayerCountDropdown extends View {
 
         if (!expanded) return -1;
 
-        // Клик по выпадающим элементам (они находятся ниже основной кнопки y)
-        // Считаем индекс сверху вниз (первый элемент под кнопкой имеет индекс 0)
         int index = (int) ((headerMinY - ty) / height);
         int value = MenuPlaySettings.MIN_FRIEND_PLAYERS + index;
 
@@ -107,11 +99,9 @@ public class PlayerCountDropdown extends View {
 
         if (!expanded) return;
 
-        // Рисуем элементы списка, уходящие вниз под главную кнопку
         int count = 0;
         for (int p = MenuPlaySettings.MIN_FRIEND_PLAYERS; p <= MenuPlaySettings.MAX_FRIEND_PLAYERS; p++) {
             count++;
-            // Каждый следующий элемент смещается ниже по оси Y
             float rowY = y - (height * count);
 
             float alpha = p == selectedCount ? 1f : 0.55f;

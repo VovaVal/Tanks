@@ -1,8 +1,5 @@
 package com.mygdx.tanks;
 
-/**
- * Настройки с экрана выбора уровня (режим и число игроков).
- */
 public class MenuPlaySettings {
 
     public static final int MIN_FRIEND_PLAYERS = 2;

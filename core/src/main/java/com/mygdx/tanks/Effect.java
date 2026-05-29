@@ -13,7 +13,6 @@ public class Effect {
     public Vector2 position;
     private float size;
     public boolean isPlayerSpawn = false;
-    /** Индекс слота игрока (0..3) в режиме с друзьями; иначе -1 */
     public int playerSpawnSlot = -1;
 
     public Effect(Texture[] frames, Vector2 position, float frameTime, float size) {

@@ -71,7 +71,6 @@ public class GameScreen extends ScreenAdapter {
     private OrthographicCamera uiCamera;   // для UI
     private int backBufferW = 1;
     private int backBufferH = 1;
-    /** Карта без искажения пропорций; поля вне мира — светло-серые (см. draw). */
     private static final float LETTERBOX_R = 0.88f;
     private static final float LETTERBOX_G = 0.88f;
     private static final float LETTERBOX_B = 0.90f;
@@ -1107,11 +1106,6 @@ public class GameScreen extends ScreenAdapter {
 
                 switch (gameSession.state) {
                     case PLAYING:
-//                        if (pauseBtnImg.isHit(touchPos.x, touchPos.y)) {
-//                            myGdxGame.audioManager.btnClick.play();
-//                            gameSession.pauseGame();
-//                        }
-
                         if (touchPos.x >= pauseBtnImg.x && touchPos.x <= (pauseBtnImg.x + pauseBtnImg.width) &&
                             touchPos.y >= pauseBtnImg.y && touchPos.y <= (pauseBtnImg.y + pauseBtnImg.height)) {
 
@@ -1277,7 +1271,6 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
-    /** Сердца и счётчик врагов — правый верхний угол виртуального HUD с отступом от краёв. */
     private void layoutTopRightHud() {
         if (liveView == null || tanksKilledText == null || tanksAllText == null || enemyTankImg == null) {
             return;
@@ -1308,7 +1301,6 @@ public class GameScreen extends ScreenAdapter {
         tanksAllText.setBounds(iconX + iconS + miniGap + twK, textY, twA, txH);
     }
 
-    /** Центр экрана: надпись Pause и кнопки в 2× размере (только экран паузы). */
     private void layoutPauseOverlay() {
         if (pauseTextView == null || continueButton == null || homeButton == null) {
             return;
@@ -1342,7 +1334,6 @@ public class GameScreen extends ScreenAdapter {
         font.getData().setScale(sx, sy);
     }
 
-    /** Экран победы/поражения: крупные кнопки и надпись по центру (масштаб шрифта ×2). */
     private void layoutEndedOverlay() {
         if (loseWinTextView == null || continueButton2 == null || homeButton2 == null) {
             return;

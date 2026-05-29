@@ -1,18 +1,12 @@
 package com.mygdx.tanks;
 
 public class GameSettings {
-    /**
-     * Виртуальный холст для меню и HUD: координаты UI, затем StretchViewport на весь экран.
-     * Фоновые картинки меню нужно рисовать на весь этот размер, иначе по краям холста будут «полосы».
-     */
     public static final int UI_VIEWPORT_WIDTH = 3000;
     public static final int UI_VIEWPORT_HEIGHT = 1200;
 
-    /** Совместимость: базовый «логический» экран для камеры и редких компонентов */
     public static final int SCREEN_WIDTH = UI_VIEWPORT_WIDTH;
     public static final int SCREEN_HEIGHT = UI_VIEWPORT_HEIGHT;
 
-    // Сетка уровня (в пикселях)
     public static final int TILE_SIZE = 64;
     public static final int MAP_WIDTH = 1408;
     public static final int MAP_HEIGHT = 1408;
@@ -67,7 +61,6 @@ public class GameSettings {
     public static final int TILE_SPAWN = 6;
 
     // Параметры
-    /** Авто-выстрел каждого игрока в режиме «с друзьями» */
     public static final float FRIENDS_AUTO_SHOOT_INTERVAL_SEC = 1f;
 
     public static final int SHOOTING_COOL_DOWN = 500; // ms
